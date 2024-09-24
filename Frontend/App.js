@@ -19,7 +19,7 @@
 //   },
 // });
 import { Text, View } from "react-native";
-import Login from "./src/components/Login.jsx";
+import Login from "./src/components/Landingpage.jsx";
 export default function Index() {
   return (
     <View

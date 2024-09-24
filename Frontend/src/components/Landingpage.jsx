@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, } from 'react-native'
 import React from 'react'
-import { Colors } from '@/constants/Colors'
+import { Colors } from '../constants/Colors.js'
 import { useRouter } from 'expo-router';
 
 export default function login() { 
@@ -9,7 +9,7 @@ export default function login() {
   return (
     <View>
       <Image
-        source={require("./../assets/images/airobo2.jpg")}
+        source={require("../assets/airobo2.jpg")}
         style={{
           width: "100%",
           height: 520,
