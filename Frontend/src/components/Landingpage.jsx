@@ -9,7 +9,7 @@ export default function login() {
   return (
     <View>
       <Image
-        source={require("../assets/airobo2.jpg")}
+        source={require("../assets/landingimage.jpg")}
         style={{
           width: "100%",
           height: 520,
