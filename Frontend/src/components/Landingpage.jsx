@@ -1,11 +1,11 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, } from 'react-native'
-import React from 'react'
-import { Colors } from '../constants/Colors.js'
-import { useRouter } from 'expo-router';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
+import { Colors } from "../constants/Colors.js";
+import { useNavigation, useRouter } from "expo-router";
 
-export default function login() { 
+function Landing({ navigation }) {
+  const router = useRouter();
 
-  const router=useRouter();
   return (
     <View>
       <Image
@@ -40,8 +40,9 @@ export default function login() {
           unique journey!
         </Text>
 
-        <TouchableOpacity style={styles.button}
-            onPress={()=>router.push('auth/sign-in')}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("SignIn")}
         >
           <Text
             style={{
@@ -59,20 +60,21 @@ export default function login() {
   );
 }
 
+export default Landing;
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor:Colors.WHITE,
-    marginTop:-20,
-    borderTopLeftRadius:30,
-    borderTopRightRadius:30,
-    height:'100%',
-    padding:25,
+    backgroundColor: Colors.WHITE,
+    marginTop: -25,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    height: "100%",
+    padding: 25,
   },
-  button:{
-    padding:15,
-    backgroundColor:Colors.PRIMARY,
-    borderRadius:99,
-    marginTop:'20%',
-
-  }
-})
+  button: {
+    padding: 15,
+    backgroundColor: Colors.PRIMARY,
+    borderRadius: 99,
+    marginTop: "20%",
+  },
+});
