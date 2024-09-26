@@ -9,7 +9,7 @@ function Landing({ navigation }) {
   return (
     <View>
       <Image
-        source={require("../assets/landingimage.jpg")}
+        source={require("../assets/landingimage.png")}
         style={{
           width: "100%",
           height: 520,
