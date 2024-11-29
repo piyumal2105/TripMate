@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { auth } from "../config/firebase.js";
 
+// Register user
 export const registerUser = async (req, res) => {
   const { fullName, email, password } = req.body;
 
@@ -22,23 +23,40 @@ export const registerUser = async (req, res) => {
   }
 };
 
+// User login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await auth.getUserByEmail(email);
+    // Retrieve user record by email using Firebase Admin SDK
+    const userRecord = await auth.getUserByEmail(email);
 
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch) throw new Error("Invalid credentials");
-
-    // Generate JWT
-    const token = jwt.sign({ uid: user.uid }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+    // Generate JWT Token after successful user retrieval
+    const token = jwt.sign({ uid: userRecord.uid }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expiration
     });
 
-    res.status(200).json({ token });
+    // Return success response with the JWT and user details
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        displayName: userRecord.displayName,
+      },
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    // Handle Firebase errors, such as user not found or any other errors
+    if (error.code === "auth/user-not-found") {
+      res.status(400).json({
+        error: "User not found. Please check your email and password.",
+      });
+    } else if (error.code === "auth/wrong-password") {
+      res.status(400).json({ error: "Incorrect password. Please try again." });
+    } else {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
   }
 };
