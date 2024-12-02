@@ -3,6 +3,7 @@
     "name": "Frontend",
     "slug": "Frontend",
     "version": "1.0.0",
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./src/assets/logo.png",
     "userInterfaceStyle": "light",
@@ -18,7 +19,10 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "android": {
+      "newArchEnabled": true
+    }
     },
     "web": {
       "favicon": "./src/assets/logo.png"
