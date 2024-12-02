@@ -24,6 +24,12 @@ export default function SignUp({ navigation }) {
     }
 
     try {
+      console.log("Attempting to register user:", {
+        fullName,
+        email,
+        password,
+      });
+
       const response = await fetch("http://10.0.2.2:5001/api/auth/register", {
         method: "POST",
         headers: {
@@ -33,29 +39,23 @@ export default function SignUp({ navigation }) {
       });
 
       console.log("Response Status:", response.status);
-
-      let result;
-      try {
-        result = await response.json();
-      } catch (err) {
-        console.error("Error parsing JSON:", err);
-        Alert.alert("Error", "Unexpected response from server");
-        return;
-      }
-
+      const result = await response.json();
       console.log("Response Body:", result);
 
       if (response.ok) {
-        Alert.alert("Success", "Account created successfully!");
-        navigation.navigate("SignIn");
-      } else if (result && result.error) {
-        Alert.alert("Error", result.error);
+        console.log("Registration successful, navigating to SignIn...");
+        Alert.alert(
+          "Success",
+          result.message || "Account created successfully!",
+          [{ text: "OK", onPress: () => navigation.navigate("SignIn") }]
+        );
       } else {
-        Alert.alert("Error", "Unexpected error occurred.");
+        console.log("Error occurred during registration:", result);
+        Alert.alert("Error", result.error || "Unexpected error occurred.");
       }
     } catch (error) {
+      console.error("Error during registration:", error);
       Alert.alert("Error", "Something went wrong. Please try again.");
-      console.error(error);
     }
   };
 
