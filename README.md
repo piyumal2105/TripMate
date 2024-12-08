@@ -20,3 +20,7 @@ React Native: Builds the app for both iOS and Android with one codebase. Node.js
 How It Works:
 
 Planning: Users enter their travel details (budget, duration, etc.), and TripMate recommends trips and activities. Navigation: During the trip, the app provides real-time traffic info and directions. Sharing: Users can share their experiences with others and get inspired by the community. Emergency Help: Users can easily contact local emergency services if needed.
+
+
+![image](https://github.com/user-attachments/assets/3ec24bb4-9c4d-4901-a502-0ae01b161194)
+
