@@ -5,31 +5,36 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { Colors } from "../constants/Colors.js";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function SignUp({ navigation }) {
-  // State variables to handle form input
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Function to handle user registration
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSignUp = async () => {
     if (!fullName || !email || !password) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
 
-    try {
-      console.log("Attempting to register user:", {
-        fullName,
-        email,
-        password,
-      });
+    if (!isValidEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
 
+    setLoading(true);
+
+    try {
       const response = await fetch("http://10.0.2.2:5001/api/auth/register", {
         method: "POST",
         headers: {
@@ -38,53 +43,39 @@ export default function SignUp({ navigation }) {
         body: JSON.stringify({ fullName, email, password }),
       });
 
-      console.log("Response Status:", response.status);
+      console.log(response);
+
       const result = await response.json();
-      console.log("Response Body:", result);
+
+      console.log(result);
 
       if (response.ok) {
-        console.log("Registration successful, navigating to SignIn...");
         Alert.alert(
           "Success",
-          result.message || "Account created successfully!",
-          [{ text: "OK", onPress: () => navigation.navigate("SignIn") }]
+          result.message || "Account created successfully!"
         );
+        navigation.navigate("SignIn");
       } else {
-        console.log("Error occurred during registration:", result);
         Alert.alert("Error", result.error || "Unexpected error occurred.");
       }
     } catch (error) {
-      console.error("Error during registration:", error);
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
-    <View
-      style={{
-        padding: 25,
-        paddingTop: 50,
-        backgroundColor: Colors.WHITE,
-        height: "100%",
-      }}
-    >
+    <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
-      <Text
-        style={{
-          fontFamily: "outfit-bold",
-          fontSize: 30,
-          marginTop: 30,
-        }}
-      >
-        Create New Account
-      </Text>
+      <Text style={styles.title}>Create New Account</Text>
 
-      {/* Full Name Input */}
-      <View style={{ marginTop: 50 }}>
-        <Text style={{ fontFamily: "outfit" }}>Full Name</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Full Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Full Name"
@@ -93,9 +84,8 @@ export default function SignUp({ navigation }) {
         />
       </View>
 
-      {/* Email Input */}
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ fontFamily: "outfit" }}>Email</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           keyboardType="email-address"
           style={styles.input}
@@ -105,9 +95,8 @@ export default function SignUp({ navigation }) {
         />
       </View>
 
-      {/* Password Input */}
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ fontFamily: "outfit" }}>Password</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Password</Text>
         <TextInput
           secureTextEntry={true}
           style={styles.input}
@@ -117,58 +106,75 @@ export default function SignUp({ navigation }) {
         />
       </View>
 
-      {/* Create Account Button */}
       <TouchableOpacity
         onPress={handleSignUp}
-        style={{
-          padding: 20,
-          // backgroundColor: Colors.PRIMARY,
-          backgroundColor: "#0478A7",
-          borderRadius: 15,
-          marginTop: 50,
-        }}
+        style={[
+          styles.button,
+          { backgroundColor: loading ? "#cccccc" : "#0478A7" },
+        ]}
+        disabled={loading}
       >
-        <Text
-          style={{
-            color: Colors.WHITE,
-            textAlign: "center",
-            fontFamily: "outfit-bold",
-          }}
-        >
-          Create Account
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Create Account</Text>
+        )}
       </TouchableOpacity>
 
-      {/* Sign In Button */}
       <TouchableOpacity
         onPress={() => navigation.navigate("SignIn")}
-        style={{
-          padding: 20,
-          backgroundColor: Colors.WHITE,
-          borderRadius: 15,
-          marginTop: 20,
-          borderWidth: 1,
-        }}
+        style={styles.signInButton}
       >
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-            textAlign: "center",
-          }}
-        >
-          Sign In
-        </Text>
+        <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 25,
+    paddingTop: 50,
+    backgroundColor: Colors.WHITE,
+    height: "100%",
+  },
+  title: {
+    fontFamily: "outfit-bold",
+    fontSize: 30,
+    marginTop: 30,
+  },
+  inputContainer: {
+    marginTop: 20,
+  },
+  label: {
+    fontFamily: "outfit",
+  },
   input: {
     padding: 15,
     borderWidth: 1,
     borderColor: Colors.GRAY,
     borderRadius: 15,
     fontFamily: "outfit",
+  },
+  button: {
+    padding: 20,
+    borderRadius: 15,
+    marginTop: 50,
+  },
+  buttonText: {
+    color: Colors.WHITE,
+    textAlign: "center",
+    fontFamily: "outfit-bold",
+  },
+  signInButton: {
+    padding: 20,
+    backgroundColor: Colors.WHITE,
+    borderRadius: 15,
+    marginTop: 20,
+    borderWidth: 1,
+  },
+  signInText: {
+    color: Colors.PRIMARY,
+    textAlign: "center",
   },
 });

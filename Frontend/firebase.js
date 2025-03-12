@@ -1,25 +1,21 @@
-// // firebase.js
-// import { initializeApp } from 'firebase/app';
-// import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import firebase from "firebase/app";
+import "firebase/auth"; // Firebase authentication
+import "firebase/firestore"; // Firebase Firestore (if you need it)
 
-// // Your Firebase configuration
-// const firebaseConfig = {
-//   apiKey: "AIzaSyBRRxvoGYX_tG_I8OuF7lM8RhnN3aaq37o",
-//   authDomain: "tripmate-64715.firebaseapp.com",
-//   projectId: "tripmate-64715",
-//   storageBucket: "tripmate-64715.appspot.com",
-//   messagingSenderId: "600665897177",
-//   appId: "1:600665897177:web:a48a9cdea3ebbe5498e6c8",
-//   measurementId: "G-JN1R3MW5G2",
-// };
+const firebaseConfig = {
+  apiKey: "AIzaSyBZQawz66tnMH_iitjpZkNd3Jd3Kw4EhK4",
+  authDomain: "tripmate-69813.firebaseapp.com",
+  projectId: "tripmate-69813",
+  storageBucket: "tripmate-69813.firebasestorage.app",
+  messagingSenderId: "688630563885",
+  appId: "1:688630563885:web:40658c978af31ca532a4a4",
+  measurementId: "G-8FPL2WF0XG",
+};
 
-// // Initialize Firebase app
-// const app = initializeApp(firebaseConfig);
+const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-// // Initialize Firebase Auth with React Native Persistence
-// const auth = initializeAuth(app, {
-//   persistence: getReactNativePersistence(AsyncStorage),  // Use React Native AsyncStorage for persistence
-// });
+// Export auth and firestore for usage in your app
+const auth = firebaseApp.auth();
+const db = firebaseApp.firestore();
 
-// export { app, auth };
+export { auth, db };

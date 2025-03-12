@@ -5,191 +5,177 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
+  Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Colors } from "../constants/Colors.js";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignIn({ navigation }) {
-  // State variables to handle form input
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Function to handle user login
+  const BASE_URL =
+    Platform.OS === "android"
+      ? "http://10.0.2.2:5001"
+      : "http://localhost:5001";
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem("authToken");
+      if (token) {
+        navigation.replace("Landing");
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
   const handleSignIn = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
 
+    setLoading(true);
+
     try {
-      // Make a POST request to the backend API
-      const response = await fetch("http://10.0.2.2:5001/api/auth/login", {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        body: JSON.stringify({ email, password }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
+        await AsyncStorage.setItem("authToken", result.token);
+
         Alert.alert("Success", "Logged in successfully!");
-        // Navigate to the home page
-        navigation.navigate("HomePage");
+        navigation.replace("HomePage"); // Replace SignIn with HomePage
       } else {
-        // Display error message from the backend
         Alert.alert("Error", result.error || "Invalid email or password");
       }
     } catch (error) {
       Alert.alert("Error", "Something went wrong. Please try again.");
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View
-      style={{
-        padding: 25,
-        paddingTop: 40,
-        backgroundColor: Colors.WHITE,
-        height: "100%",
-      }}
-    >
+    <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.navigate("Landing")}>
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
-      <Text
-        style={{
-          fontFamily: "outfit-bold",
-          fontSize: 30,
-          marginTop: 30,
-        }}
-      >
-        Let's Sign You In
-      </Text>
 
-      <Text
-        style={{
-          fontFamily: "outfit",
-          fontSize: 30,
-          color: Colors.GRAY,
-          marginTop: 20,
-        }}
-      >
-        Welcome Back
-      </Text>
+      <Text style={styles.title}>Let's Sign You In</Text>
+      <Text style={styles.subtitle}>Welcome Back</Text>
+      <Text style={styles.subtitle}>You've been missed!</Text>
 
-      <Text
-        style={{
-          fontFamily: "outfit",
-          fontSize: 30,
-          color: Colors.GRAY,
-          marginTop: 10,
-        }}
-      >
-        You've been missed!
-      </Text>
-
-      {/* Email Input */}
-      <View
-        style={{
-          marginTop: 50,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Email
-        </Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Email"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
       </View>
 
-      {/* Password Input */}
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Password
-        </Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Password</Text>
         <TextInput
-          secureTextEntry={true}
           style={styles.input}
           placeholder="Enter Password"
           value={password}
           onChangeText={setPassword}
+          secureTextEntry={true}
         />
       </View>
 
-      {/* Sign In Button */}
       <TouchableOpacity
         onPress={handleSignIn}
-        style={{
-          padding: 20,
-          backgroundColor: "#0478A7",
-          borderRadius: 15,
-          marginTop: 50,
-        }}
+        style={[styles.button, loading && { opacity: 0.7 }]}
+        disabled={loading}
       >
-        <Text
-          style={{
-            color: Colors.WHITE,
-            textAlign: "center",
-            fontFamily: "outfit-bold",
-          }}
-        >
-          Sign In
-        </Text>
+        {loading ? (
+          <ActivityIndicator color={Colors.WHITE} />
+        ) : (
+          <Text style={styles.buttonText}>Sign In</Text>
+        )}
       </TouchableOpacity>
 
-      {/* Create Account Button */}
       <TouchableOpacity
         onPress={() => navigation.navigate("SignUp")}
-        style={{
-          padding: 20,
-          backgroundColor: Colors.WHITE,
-          borderRadius: 15,
-          marginTop: 20,
-          borderWidth: 1,
-        }}
+        style={styles.createAccountButton}
       >
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-            textAlign: "center",
-            fontFamily: "outfit-bold",
-          }}
-        >
-          Create Account
-        </Text>
+        <Text style={styles.createAccountText}>Create Account</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 25,
+    paddingTop: 40,
+    backgroundColor: Colors.WHITE,
+    height: "100%",
+  },
+  title: {
+    fontFamily: "outfit-bold",
+    fontSize: 30,
+    marginTop: 30,
+  },
+  subtitle: {
+    fontFamily: "outfit",
+    fontSize: 30,
+    color: Colors.GRAY,
+    marginTop: 10,
+  },
+  inputContainer: {
+    marginTop: 20,
+  },
+  label: {
+    fontFamily: "outfit",
+  },
   input: {
     padding: 15,
     borderWidth: 1,
     borderColor: Colors.GRAY,
     borderRadius: 15,
     fontFamily: "outfit",
+  },
+  button: {
+    padding: 20,
+    backgroundColor: "#0478A7",
+    borderRadius: 15,
+    marginTop: 50,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: Colors.WHITE,
+    fontFamily: "outfit-bold",
+  },
+  createAccountButton: {
+    padding: 20,
+    backgroundColor: Colors.WHITE,
+    borderRadius: 15,
+    marginTop: 20,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  createAccountText: {
+    color: Colors.PRIMARY,
+    fontFamily: "outfit-bold",
   },
 });
