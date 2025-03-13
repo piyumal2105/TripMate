@@ -9,7 +9,7 @@ const firebaseConfig = {
   storageBucket: "tripmate-ec1fe.firebasestorage.app",
   messagingSenderId: "1024669533218",
   appId: "1:1024669533218:web:6f9ce2925d3682de04b67b",
-  measurementId: "G-RFEX7ZCDLD",
+  measurementId: "G-RFEX7ZCDLD"
 };
 
 const app = initializeApp(firebaseConfig);

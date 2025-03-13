@@ -26,7 +26,10 @@
       "android": {
         "newArchEnabled": true
       },
-      "package": "com.tripmate"
+      "package": "com.tripmate",
+      "permissions": [
+        "INTERNET"
+      ]
     },
     "web": {
       "favicon": "./src/assets/logo.png"

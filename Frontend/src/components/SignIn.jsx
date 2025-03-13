@@ -11,21 +11,64 @@ import React, { useState, useEffect } from "react";
 import { Colors } from "../constants/Colors.js";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 import { auth } from "../../firebase.js";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+
+  // Check for internet connection
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        // For React Native 0.63 and above:
+        const state = await NetInfo.fetch();
+        setIsConnected(state.isConnected);
+
+        // Subscribe to network state updates
+        const unsubscribe = NetInfo.addEventListener((state) => {
+          setIsConnected(state.isConnected);
+        });
+
+        return () => {
+          unsubscribe();
+        };
+      } catch (error) {
+        console.error("Error checking network:", error);
+        // If NetInfo fails, assume connection is available
+        setIsConnected(true);
+      }
+    };
+
+    checkConnection();
+  }, []);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        navigation.replace("HomePage");
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (token) {
+          // Add a small delay to ensure navigation works properly
+          setTimeout(() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "HomePage" }],
+            });
+          }, 100);
+        }
+      } catch (error) {
+        console.error("Error checking login status:", error);
       }
     };
+
     checkLoginStatus();
   }, []);
 
@@ -35,22 +78,80 @@ export default function SignIn({ navigation }) {
       return;
     }
 
+    if (!isConnected) {
+      Alert.alert(
+        "No Internet Connection",
+        "Please check your internet connection and try again."
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
+      // Try sign in with retry logic
+      let attempts = 0;
+      const maxAttempts = 2;
 
-      await AsyncStorage.setItem("authToken", user.uid);
+      while (attempts < maxAttempts) {
+        try {
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+          const user = userCredential.user;
 
-      Alert.alert("Success", "Logged in successfully!");
-      navigation.replace("HomePage");
+          // Store the token
+          await AsyncStorage.setItem("authToken", user.uid);
+
+          // Sign in successful
+          Alert.alert("Success", "Logged in successfully!", [
+            {
+              text: "OK",
+              onPress: () => {
+                // Use navigation.reset to clear the navigation stack
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "HomePage" }],
+                });
+              },
+            },
+          ]);
+          return; // Exit the function if successful
+        } catch (error) {
+          if (
+            error.code === "auth/network-request-failed" &&
+            attempts < maxAttempts - 1
+          ) {
+            // Wait before retrying
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+            attempts++;
+            continue;
+          }
+          throw error; // Re-throw if it's not a network error or we've hit max attempts
+        }
+      }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      console.error("Sign in error:", error);
+
+      // Provide a more user-friendly error message
+      let errorMessage =
+        "Failed to sign in. Please check your credentials and try again.";
+
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
+        errorMessage = "Invalid email or password.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.code === "auth/network-request-failed") {
+        errorMessage =
+          "Network error. Please check your internet connection and try again.";
+      }
+
+      Alert.alert("Sign In Failed", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -61,6 +162,14 @@ export default function SignIn({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate("Landing")}>
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
+
+      {!isConnected && (
+        <View style={styles.networkWarning}>
+          <Text style={styles.networkWarningText}>
+            No internet connection. Please connect to continue.
+          </Text>
+        </View>
+      )}
 
       <Text style={styles.title}>Let's Sign You In</Text>
       <Text style={styles.subtitle}>Welcome Back</Text>
@@ -91,8 +200,12 @@ export default function SignIn({ navigation }) {
 
       <TouchableOpacity
         onPress={handleSignIn}
-        style={[styles.button, loading && { opacity: 0.7 }]}
-        disabled={loading}
+        style={[
+          styles.button,
+          loading && { opacity: 0.7 },
+          !isConnected && { backgroundColor: Colors.GRAY },
+        ]}
+        disabled={loading || !isConnected}
       >
         {loading ? (
           <ActivityIndicator color={Colors.WHITE} />
@@ -164,5 +277,16 @@ const styles = StyleSheet.create({
   createAccountText: {
     color: Colors.PRIMARY,
     fontFamily: "outfit-bold",
+  },
+  networkWarning: {
+    backgroundColor: "#FFE4E1",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  networkWarningText: {
+    color: "#FF0000",
+    fontFamily: "outfit",
+    textAlign: "center",
   },
 });
