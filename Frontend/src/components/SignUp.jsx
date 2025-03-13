@@ -6,20 +6,22 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import React, { useState } from "react";
 import { Colors } from "../constants/Colors.js";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../../firebase.js";
 
 export default function SignUp({ navigation }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignUp = async () => {
     if (!fullName || !email || !password) {
@@ -33,37 +35,35 @@ export default function SignUp({ navigation }) {
     }
 
     setLoading(true);
+    setModalVisible(true); // Show loading overlay
 
     try {
-      const response = await fetch("http://10.0.2.2:5001/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ fullName, email, password }),
+      console.log("Before creating user");
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ).catch((error) => {
+        console.log("Error creating user: ", error);
       });
+      // const user = userCredential.user;
 
-      console.log(response);
+      // Update user profile with full name
+      // await updateProfile(user, { displayName: fullName });
 
-      const result = await response.json();
+      Alert.alert("Success", "Account created successfully!");
 
-      console.log(result);
-
-      if (response.ok) {
-        Alert.alert(
-          "Success",
-          result.message || "Account created successfully!"
-        );
+      // Wait a moment before navigating (for better UX)
+      setTimeout(() => {
+        setModalVisible(false);
         navigation.navigate("SignIn");
-      } else {
-        Alert.alert("Error", result.error || "Unexpected error occurred.");
-      }
+      }, 1500);
     } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert("Error", error.message);
+      setModalVisible(false);
+    } finally {
+      setLoading(false);
     }
-    // finally {
-    //   setLoading(false);
-    // }
   };
 
   return (
@@ -114,11 +114,7 @@ export default function SignUp({ navigation }) {
         ]}
         disabled={loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Create Account</Text>
-        )}
+        <Text style={styles.buttonText}>Create Account</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -127,6 +123,14 @@ export default function SignUp({ navigation }) {
       >
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
+
+      {/* Styled Loader Modal */}
+      <Modal transparent={true} visible={modalVisible}>
+        <View style={styles.modalBackground}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={styles.loadingText}>Creating your account...</Text>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -176,5 +180,16 @@ const styles = StyleSheet.create({
   signInText: {
     color: Colors.PRIMARY,
     textAlign: "center",
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "#fff",
+    fontSize: 18,
   },
 });

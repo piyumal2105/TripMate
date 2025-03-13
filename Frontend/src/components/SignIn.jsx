@@ -6,29 +6,24 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  Platform,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Colors } from "../constants/Colors.js";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase.js";
 
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const BASE_URL =
-    Platform.OS === "android"
-      ? "http://10.0.2.2:5001"
-      : "http://localhost:5001";
-
-  // Check if user is already logged in
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem("authToken");
       if (token) {
-        navigation.replace("Landing");
+        navigation.replace("HomePage");
       }
     };
     checkLoginStatus();
@@ -43,27 +38,19 @@ export default function SignIn({ navigation }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-      const result = await response.json();
+      await AsyncStorage.setItem("authToken", user.uid);
 
-      if (response.ok) {
-        await AsyncStorage.setItem("authToken", result.token);
-
-        Alert.alert("Success", "Logged in successfully!");
-        navigation.replace("HomePage"); // Replace SignIn with HomePage
-      } else {
-        Alert.alert("Error", result.error || "Invalid email or password");
-      }
+      Alert.alert("Success", "Logged in successfully!");
+      navigation.replace("HomePage");
     } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
-      console.error(error);
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }

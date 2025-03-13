@@ -1,21 +1,18 @@
-import firebase from "firebase/app";
-import "firebase/auth"; // Firebase authentication
-import "firebase/firestore"; // Firebase Firestore (if you need it)
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBZQawz66tnMH_iitjpZkNd3Jd3Kw4EhK4",
-  authDomain: "tripmate-69813.firebaseapp.com",
-  projectId: "tripmate-69813",
-  storageBucket: "tripmate-69813.firebasestorage.app",
-  messagingSenderId: "688630563885",
-  appId: "1:688630563885:web:40658c978af31ca532a4a4",
-  measurementId: "G-8FPL2WF0XG",
+  apiKey: "AIzaSyDLZG2arBkbGvkt82KktyXJhQY68YVJUcU",
+  authDomain: "tripmate-ec1fe.firebaseapp.com",
+  databaseURL: "https://tripmate-ec1fe-default-rtdb.firebaseio.com",
+  projectId: "tripmate-ec1fe",
+  storageBucket: "tripmate-ec1fe.firebasestorage.app",
+  messagingSenderId: "1024669533218",
+  appId: "1:1024669533218:web:6f9ce2925d3682de04b67b",
+  measurementId: "G-RFEX7ZCDLD",
 };
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-// Export auth and firestore for usage in your app
-const auth = firebaseApp.auth();
-const db = firebaseApp.firestore();
-
-export { auth, db };
+export { auth };

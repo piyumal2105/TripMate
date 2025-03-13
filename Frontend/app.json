@@ -13,16 +13,20 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tripmate"
     },
     "android": {
       "adaptiveIcon": {
+        "googleServicesFile": "./google-services.json",
         "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#ffffff"
       },
       "android": {
-      "newArchEnabled": true
-    }
+        "newArchEnabled": true
+      },
+      "package": "com.tripmate"
     },
     "web": {
       "favicon": "./src/assets/logo.png"
@@ -32,8 +36,17 @@
       "android",
       "web"
     ],
-    "plugins": [
-      "expo-router"
+    "plugins": [      
+      "expo-router",
+      [
+        "expo-build-properties", {
+          "ios": {
+            "useFrameWork": "static"
+          }
+        }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
     ]
   }
 }
