@@ -14,7 +14,7 @@ const firebaseConfig = {
   storageBucket: "travel-planner-89979.firebasestorage.app",
   messagingSenderId: "458478614611",
   appId: "1:458478614611:web:ce9881ec3e89685f3e2ea6",
-  measurementId: "G-D1P6F4TLDS"
+  measurementId: "G-D1P6F4TLDS",
 };
 
 // Initialize Firebase

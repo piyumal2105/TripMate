@@ -3,7 +3,7 @@
     "name": "ai-travel-planner-app",
     "slug": "ai-travel-planner-app",
     "version": "1.0.0",
-    "newArchEnabled": true, 
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "scheme": "myapp",
@@ -29,7 +29,7 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
     ],
     "experiments": {
       "typedRoutes": true

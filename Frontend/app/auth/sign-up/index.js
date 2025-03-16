@@ -39,7 +39,8 @@ export default function SignUp() {
         // Signed up
         const user = userCredential.user;
         console.log(user);
-        router.replace("/auth/sign-in");
+        router.replace("TravelPreferenceScreens/TravelPreferenceScreen");
+        // router.replace("auth/sign-in");
 
         // ...
       })
@@ -65,8 +66,8 @@ export default function SignUp() {
       </TouchableOpacity>
       <Text
         style={{
-          fontFamily: "outfit-bold",
-          fontSize: 30,
+          // fontFamily: "outfit-bold",
+          fontSize: 35,
           marginTop: 30,
         }}
       >
@@ -136,7 +137,7 @@ export default function SignUp() {
         onPress={OnCreateAccount}
         style={{
           padding: 20,
-          backgroundColor: Colors.PRIMARY,
+          backgroundColor: "#0478A7",
           borderRadius: 15,
           marginTop: 50,
         }}
