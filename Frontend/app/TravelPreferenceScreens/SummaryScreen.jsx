@@ -128,7 +128,7 @@ const SummaryScreen = () => {
         { text: "OK", onPress: () => router.push("auth/sign-in") },
       ]);
 
-      router.push("auth/sign-in");
+      router.push("/mytrip");
     } catch (error) {
       console.error("Error saving preferences:", error);
       Alert.alert("Error", "Failed to save preferences. Please try again.");

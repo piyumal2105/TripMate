@@ -233,12 +233,12 @@ const UserProfileScreen = () => {
       </ScrollView>
 
       {/* Logout Button at bottom */}
-      <View style={styles.logoutContainer}>
+      <View style={styles.logoutContainer} onPress={handleLogout}>
         <TouchableOpacity
           style={styles.logoutButtonBottomContainer}
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={24} color="white" />
+          <Ionicons name="log-out-outline" size={24} color="#0478A7" />
           <Text style={styles.logoutBottomText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   logoutButtonBottomContainer: {
     flexDirection: "row",
-    backgroundColor: "#0478A7",
+    // backgroundColor: "#0478A7",
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 10,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   logoutBottomText: {
-    color: "white",
+    color: "#0478A7",
     fontWeight: "600",
     fontSize: 18,
     marginLeft: 8,

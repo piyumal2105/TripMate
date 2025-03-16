@@ -40,7 +40,7 @@ export default function StartNewTripcard() {
         onPress={() => router.push("/create-trip/search-place")}
         style={{
           padding: 15,
-          backgroundColor: Colors.PRIMARY,
+          backgroundColor: "#0478A7",
           borderRadius: 15,
           paddingHorizontal: 30,
         }}

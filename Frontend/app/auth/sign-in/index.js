@@ -41,7 +41,7 @@ export default function SignIn() {
       .then((userCredential) => {
         const user = userCredential.user;
         // router.replace("/mytrip");
-        router.replace("UserProfileScreen/UserProfileScreen");
+        router.replace("/mytrip");
         console.log(user);
       })
       .catch((error) => {

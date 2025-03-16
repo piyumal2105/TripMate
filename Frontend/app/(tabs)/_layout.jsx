@@ -5,7 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 // import { Colors } from "./../../constants/Colors";
 
 const Colors = {
-  PRIMARY: "#0478A7", // Change this to your primary color
+  PRIMARY: "#0478A7",
 };
 export default function TabLayout() {
   return (
@@ -20,7 +20,7 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "My Trip",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="location-sharp" size={24} color="color" />
+            <Ionicons name="location-sharp" size={24} color="#0478A7" />
           ),
         }}
       />
@@ -29,7 +29,16 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Social",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="globe" size={24} color="color" />
+            <Ionicons name="globe" size={24} color="#0478A7" />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="groups"
+        options={{
+          tabBarLabel: "Groups",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="people" size={24} color="#0478A7" />
           ),
         }}
       />
@@ -38,7 +47,7 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "Maps",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="map" size={24} color="color" />
+            <Ionicons name="map" size={24} color="#0478A7" />
           ),
         }}
       />
@@ -47,11 +56,10 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "RePlan",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="repeat" size={24} color="color" />
+            <Ionicons name="repeat" size={24} color="#0478A7" />
           ),
         }}
       />
-      
     </Tabs>
   );
 }
