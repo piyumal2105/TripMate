@@ -17,12 +17,16 @@ const firebaseConfig = {
   storageBucket: "travel-planner-89979.firebasestorage.app",
   messagingSenderId: "458478614611",
   appId: "1:458478614611:web:ce9881ec3e89685f3e2ea6",
-  measurementId: "G-D1P6F4TLDS"
+  measurementId: "G-D1P6F4TLDS",
 };
-
 
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 export const auth = getAuth(app);
 export { db, collection, addDoc, doc, updateDoc, increment }; // Ensure 'collection' is exported properly
+
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+
