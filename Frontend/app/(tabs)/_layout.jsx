@@ -2,8 +2,11 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Colors } from "./../../constants/Colors";
+// import { Colors } from "./../../constants/Colors";
 
+const Colors = {
+  PRIMARY: "#0478A7", // Change this to your primary color
+};
 export default function TabLayout() {
   return (
     <Tabs
@@ -22,23 +25,33 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="discover"
+        name="social"
         options={{
-          tabBarLabel: "Discover",
+          tabBarLabel: "Social",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="compass" size={24} color="color" />
+            <Ionicons name="globe" size={24} color="color" />
           ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="maps"
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: "Maps",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person" size={24} color="color" />
+            <Ionicons name="map" size={24} color="color" />
           ),
         }}
       />
+      <Tabs.Screen
+        name="replan"
+        options={{
+          tabBarLabel: "RePlan",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="repeat" size={24} color="color" />
+          ),
+        }}
+      />
+      
     </Tabs>
   );
 }
