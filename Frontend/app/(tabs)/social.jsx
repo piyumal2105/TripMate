@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, FlatList, Dimensions, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { addDoc, updateDoc, doc, deleteDoc, increment } from 'firebase/firestore';
+import { addDoc, updateDoc, doc, deleteDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { IconButton } from 'react-native-paper';
-import { onSnapshot, collection } from 'firebase/firestore'; // Correct imports
-import { db, auth } from '../../configs/FirebaseConfig'; // Ensure 'auth' is properly initialized
+import { onSnapshot, collection } from 'firebase/firestore';
+import { db, auth } from '../../configs/FirebaseConfig';
 import { styles } from '../styles/socialStyles';
 
-// Get the screen width dynamically
 const screenWidth = Dimensions.get('window').width;
 
 const PostFeed = () => {
@@ -17,7 +16,6 @@ const PostFeed = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
 
-  // Fetch posts from Firestore
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
       const fetchedPosts = snapshot.docs.map((doc) => ({
@@ -35,16 +33,16 @@ const PostFeed = () => {
       alert('Please write something to post!');
       return;
     }
-  
+
     try {
-      const user = auth.currentUser; // Get the current user
-      const username = user ? user.displayName : 'Anonymous'; // Get the username, default to 'Anonymous'
-  
+      const user = auth.currentUser;
+      const username = user ? user.displayName : 'Anonymous';
+
       if (editingPost) {
         await updateDoc(doc(db, 'posts', editingPost.id), {
           text: postText,
           imageUri: imageUri || null,
-          username: username, // Update the username
+          username: username,
         });
         setEditingPost(null);
       } else {
@@ -52,11 +50,13 @@ const PostFeed = () => {
           text: postText,
           imageUri: imageUri || null,
           createdAt: new Date(),
-          likes: 0, // Initialize likes
-          username: username, // Save the username when creating the post
+          likes: 0,
+          likedBy: [], // Initialize likedBy as an empty array
+          username: username,
+          userId: user.uid, // Store the userId when creating a post
         });
       }
-  
+
       setPostText('');
       setImageUri(null);
       setModalVisible(false);
@@ -64,16 +64,33 @@ const PostFeed = () => {
       console.error('Error submitting post: ', error);
     }
   };
-  
-  const handleLikePost = async (postId) => {
+
+  const handleLikePost = async (postId, likedBy) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      alert('You must be logged in to like a post');
+      return;
+    }
+
+    const userId = currentUser.uid;
+    const postRef = doc(db, 'posts', postId);
+
     try {
-      const postRef = doc(db, 'posts', postId);
-      await updateDoc(postRef, {
-        likes: increment(1), // Increment the likes field
-      });
-      console.log('Post liked successfully!');
+      const currentLikedBy = likedBy || [];
+
+      if (currentLikedBy.includes(userId)) {
+        await updateDoc(postRef, {
+          likedBy: arrayRemove(userId),
+          likes: currentLikedBy.length - 1,
+        });
+      } else {
+        await updateDoc(postRef, {
+          likedBy: arrayUnion(userId),
+          likes: currentLikedBy.length + 1,
+        });
+      }
     } catch (error) {
-      console.error('Error liking post: ', error);
+      console.error('Error updating likes: ', error);
     }
   };
 
@@ -112,7 +129,6 @@ const PostFeed = () => {
 
   return (
     <View style={styles.container}>
-      {/* Add Post Input */}
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <TextInput
           placeholder="What's on your mind?"
@@ -121,7 +137,6 @@ const PostFeed = () => {
         />
       </TouchableOpacity>
 
-      {/* Post Feed */}
       {posts.length === 0 ? (
         <Text style={styles.noPostsText}>No posts available</Text>
       ) : (
@@ -131,15 +146,14 @@ const PostFeed = () => {
           renderItem={({ item }) => (
             <View style={styles.postContainer}>
               <View style={styles.postHeader}>
-  <Image
-    source={{ uri: item.profilePicture || 'https://placekitten.com/40/40' }}
-    style={styles.profilePicture}
-  />
-  <Text style={styles.username}>
-  {item.username || 'User'}
-</Text>
-
-</View>
+                <Image
+                  source={{ uri: item.profilePicture || 'https://placekitten.com/40/40' }}
+                  style={styles.profilePicture}
+                />
+                <Text style={styles.username}>
+                  {item.username || 'User'}
+                </Text>
+              </View>
 
               <Text style={styles.postText}>{item.text}</Text>
               {item.imageUri && (
@@ -149,30 +163,34 @@ const PostFeed = () => {
                   resizeMode="contain"
                 />
               )}
+
               <View style={styles.postActions}>
-                {/* Like Button */}
-                <TouchableOpacity onPress={() => handleLikePost(item.id)}>
-                  <IconButton icon="heart" size={24} color="#ff3b30" />
+                <TouchableOpacity onPress={() => handleLikePost(item.id, item.likedBy)}>
+                  <IconButton
+                    icon={item.likedBy?.includes(auth.currentUser?.uid) ? 'heart' : 'heart-outline'}
+                    size={24}
+                    color={item.likedBy?.includes(auth.currentUser?.uid) ? '#ff3b30' : '#ccc'}
+                  />
                 </TouchableOpacity>
                 <Text>{item.likes || 0} likes</Text>
               </View>
-              <View style={styles.editDeleteActions}>
-                {/* Edit Button */}
-                <TouchableOpacity onPress={() => handleEditPost(item)}>
-                  <IconButton icon="pencil" size={20} color="#008CBA" />
-                </TouchableOpacity>
-                {/* Delete Button */}
-                <TouchableOpacity onPress={() => handleDeletePost(item.id)}>
-                  <IconButton icon="delete" size={20} color="#f44336" />
-                </TouchableOpacity>
-              </View>
+
+              {item.userId === auth.currentUser?.uid && (
+                <View style={styles.editDeleteActions}>
+                  <TouchableOpacity onPress={() => handleEditPost(item)}>
+                    <IconButton icon="pencil" size={20} color="#008CBA" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDeletePost(item.id)}>
+                    <IconButton icon="delete" size={20} color="#f44336" />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           )}
           keyExtractor={(item) => item.id}
         />
       )}
 
-      {/* Modal for Adding Post */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
