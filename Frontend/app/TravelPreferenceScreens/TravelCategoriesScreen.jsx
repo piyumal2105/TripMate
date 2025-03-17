@@ -20,6 +20,10 @@ const travelCategories = [
   "Tea Plantations",
   "Temples",
   "Wildlife/National Parks",
+  "Mountains",
+  "Hiking",
+  "Adventure Sports",
+  
 ];
 
 const TravelCategoriesScreen = () => {
