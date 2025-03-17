@@ -43,6 +43,7 @@ const PostFeed = () => {
           text: postText,
           imageUri: imageUri || null,
           username: username,
+          categories: selectedCategories, // Update categories
         });
         setEditingPost(null);
       } else {
@@ -51,15 +52,19 @@ const PostFeed = () => {
           imageUri: imageUri || null,
           createdAt: new Date(),
           likes: 0,
-          likedBy: [], // Initialize likedBy as an empty array
+          likedBy: [],
           username: username,
-          userId: user.uid, // Store the userId when creating a post
+          userId: user.uid,
+          categories: selectedCategories, // Store categories
         });
+        
       }
-
       setPostText('');
       setImageUri(null);
+      setSelectedCategories([]); // Reset categories after posting
       setModalVisible(false);
+      setEditingPost(null);
+      
     } catch (error) {
       console.error('Error submitting post: ', error);
     }
@@ -98,8 +103,10 @@ const PostFeed = () => {
     setEditingPost(post);
     setPostText(post.text);
     setImageUri(post.imageUri);
+    setSelectedCategories(post.categories || []); // Load existing categories
     setModalVisible(true);
   };
+  
 
   const handleDeletePost = async (postId) => {
     try {
@@ -126,6 +133,16 @@ const PostFeed = () => {
       console.error('Error picking image: ', error);
     }
   };
+  const categories = ['Solo','Couple','Family','Nature','Wildlife', 'Mountains','Beaches', 'Adventure', 'Culture', 'religous'];
+const [selectedCategories, setSelectedCategories] = useState([]);
+const toggleCategory = (category) => {
+  setSelectedCategories((prev) =>
+    prev.includes(category)
+      ? prev.filter((item) => item !== category) // Remove if already selected
+      : [...prev, category] // Add if not selected
+  );
+};
+
 
   return (
     <View style={styles.container}>
@@ -154,6 +171,7 @@ const PostFeed = () => {
                   {item.username || 'User'}
                 </Text>
               </View>
+              
 
               <Text style={styles.postText}>{item.text}</Text>
               {item.imageUri && (
@@ -211,7 +229,23 @@ const PostFeed = () => {
                 style={styles.imagePreview}
                 resizeMode="contain"
               />
+              
             )}
+            <View style={styles.categoryContainer}>
+  {categories.map((category) => (
+    <TouchableOpacity
+      key={category}
+      style={[
+        styles.categoryButton,
+        selectedCategories.includes(category) && styles.categorySelected, // Change color if selected
+      ]}
+      onPress={() => toggleCategory(category)}
+    >
+      <Text style={styles.categoryText}>{category}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={styles.modalButton}
