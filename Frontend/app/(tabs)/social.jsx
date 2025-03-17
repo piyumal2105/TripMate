@@ -1,13 +1,11 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, FlatList, Dimensions, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import {  addDoc, updateDoc, doc, deleteDoc, increment} from '../../configs/FirebaseConfig';
+import { addDoc, updateDoc, doc, deleteDoc, increment } from 'firebase/firestore';
 import { IconButton } from 'react-native-paper';
-import { onSnapshot, collection } from "firebase/firestore"; // Correct imports
-import { db } from "../../configs/FirebaseConfig"; // Assuming 'db' is initialized correctly
-
+import { onSnapshot, collection } from 'firebase/firestore'; // Correct imports
+import { db, auth } from '../../configs/FirebaseConfig'; // Ensure 'auth' is properly initialized
+import { styles } from '../styles/socialStyles';
 
 // Get the screen width dynamically
 const screenWidth = Dimensions.get('window').width;
@@ -19,6 +17,7 @@ const PostFeed = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
 
+  // Fetch posts from Firestore
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
       const fetchedPosts = snapshot.docs.map((doc) => ({
@@ -36,12 +35,16 @@ const PostFeed = () => {
       alert('Please write something to post!');
       return;
     }
-
+  
     try {
+      const user = auth.currentUser; // Get the current user
+      const username = user ? user.displayName : 'Anonymous'; // Get the username, default to 'Anonymous'
+  
       if (editingPost) {
         await updateDoc(doc(db, 'posts', editingPost.id), {
           text: postText,
           imageUri: imageUri || null,
+          username: username, // Update the username
         });
         setEditingPost(null);
       } else {
@@ -50,9 +53,10 @@ const PostFeed = () => {
           imageUri: imageUri || null,
           createdAt: new Date(),
           likes: 0, // Initialize likes
+          username: username, // Save the username when creating the post
         });
       }
-
+  
       setPostText('');
       setImageUri(null);
       setModalVisible(false);
@@ -60,16 +64,16 @@ const PostFeed = () => {
       console.error('Error submitting post: ', error);
     }
   };
-
-  const handleLikePost = async (postId, currentLikes) => {
+  
+  const handleLikePost = async (postId) => {
     try {
-      const postRef = doc(db, "posts", postId); 
+      const postRef = doc(db, 'posts', postId);
       await updateDoc(postRef, {
-        likes: increment(1), 
+        likes: increment(1), // Increment the likes field
       });
-      console.log("Post liked successfully!");
+      console.log('Post liked successfully!');
     } catch (error) {
-      console.error("Error liking post: ", error);
+      console.error('Error liking post: ', error);
     }
   };
 
@@ -106,10 +110,6 @@ const PostFeed = () => {
     }
   };
 
-
-    
-
-
   return (
     <View style={styles.container}>
       {/* Add Post Input */}
@@ -120,7 +120,7 @@ const PostFeed = () => {
           style={styles.fakeInput}
         />
       </TouchableOpacity>
-      
+
       {/* Post Feed */}
       {posts.length === 0 ? (
         <Text style={styles.noPostsText}>No posts available</Text>
@@ -131,12 +131,16 @@ const PostFeed = () => {
           renderItem={({ item }) => (
             <View style={styles.postContainer}>
               <View style={styles.postHeader}>
-                <Image
-                  source={{ uri: item.profilePicture || 'https://placekitten.com/40/40' }}
-                  style={styles.profilePicture}
-                />
-                <Text style={styles.username}>{item.username || 'User'}</Text>
-              </View>
+  <Image
+    source={{ uri: item.profilePicture || 'https://placekitten.com/40/40' }}
+    style={styles.profilePicture}
+  />
+  <Text style={styles.username}>
+  {item.username || 'User'}
+</Text>
+
+</View>
+
               <Text style={styles.postText}>{item.text}</Text>
               {item.imageUri && (
                 <Image
@@ -148,10 +152,9 @@ const PostFeed = () => {
               <View style={styles.postActions}>
                 {/* Like Button */}
                 <TouchableOpacity onPress={() => handleLikePost(item.id)}>
-  <IconButton icon="heart" size={24} color="#ff3b30" />
-</TouchableOpacity>
-<Text>{item.likes || 0} likes</Text>
-
+                  <IconButton icon="heart" size={24} color="#ff3b30" />
+                </TouchableOpacity>
+                <Text>{item.likes || 0} likes</Text>
               </View>
               <View style={styles.editDeleteActions}>
                 {/* Edit Button */}
@@ -218,118 +221,5 @@ const PostFeed = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f9f9f9',
-  },
-  fakeInput: {
-    borderColor: '#ddd',
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: 'white',
-    marginBottom: 20,
-  },
-  textInput: {
-    borderColor: '#ddd',
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    backgroundColor: 'white',
-  },
-  imagePreview: {
-    width: 100,
-    height: 100,
-    marginVertical: 10,
-    borderRadius: 8,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: screenWidth * 0.9,
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    elevation: 5,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  modalButton: {
-    flex: 1,
-    marginHorizontal: 5,
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    color: '#f44336',
-    fontWeight: 'bold',
-  },
-  addPostButton: {
-    color: '#4CAF50',
-    fontWeight: 'bold',
-  },
-  postContainer: {
-    backgroundColor: 'white',
-    marginBottom: 20,
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  postHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  profilePicture: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  username: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  postText: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  postImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-  },
-  postActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  editDeleteActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 10,
-  },
-  noPostsText: {
-    textAlign: 'center',
-    color: '#aaa',
-    marginTop: 20,
-    fontSize: 16,
-  },
-});
 
 export default PostFeed;

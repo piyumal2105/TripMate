@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors } from "./../../../constants/Colors";
 import { useNavigation, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./../../../configs/FirebaseConfig";
-import { useState } from "react";
+import { updateProfile } from "firebase/auth";  // Import updateProfile from firebase/auth
 
 export default function SignUp() {
   const navigation = useNavigation();
@@ -29,26 +29,37 @@ export default function SignUp() {
   }, []);
 
   const OnCreateAccount = () => {
-    if (!email && !password && !fullName) {
+    if (!email || !password || !fullName) {
       ToastAndroid.show("Please fill all fields", ToastAndroid.LONG);
       return;
     }
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed up
+        // Signed up successfully
         const user = userCredential.user;
         console.log(user);
-        router.replace("TravelPreferenceScreens/TravelPreferenceScreen");
-        // router.replace("auth/sign-in");
 
-        // ...
+        // Update user's profile with the full name
+        updateProfile(user, {
+          displayName: fullName,  // Set the displayName to the fullName entered by the user
+        })
+          .then(() => {
+            console.log("Display name updated successfully");
+
+            // After updating the display name, navigate to the next screen
+            router.replace("TravelPreferenceScreens/TravelPreferenceScreen");
+          })
+          .catch((error) => {
+            console.error("Error updating display name: ", error);
+          });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage, errorCode);
-        // ..
+        // Show error message to the user if there's an issue signing up
+        ToastAndroid.show("Error signing up. Please try again.", ToastAndroid.LONG);
       });
   };
 
@@ -66,7 +77,6 @@ export default function SignUp() {
       </TouchableOpacity>
       <Text
         style={{
-          // fontFamily: "outfit-bold",
           fontSize: 35,
           marginTop: 30,
         }}
@@ -74,18 +84,8 @@ export default function SignUp() {
         Create New Account
       </Text>
 
-      <View
-        style={{
-          marginTop: 50,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Full Name
-        </Text>
+      <View style={{ marginTop: 50 }}>
+        <Text>Full Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Full Name"
@@ -93,18 +93,8 @@ export default function SignUp() {
         />
       </View>
 
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Email
-        </Text>
+      <View style={{ marginTop: 20 }}>
+        <Text>Email</Text>
         <TextInput
           style={styles.input}
           onChangeText={(value) => setEmail(value)}
@@ -112,18 +102,8 @@ export default function SignUp() {
         />
       </View>
 
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Password
-        </Text>
+      <View style={{ marginTop: 20 }}>
+        <Text>Password</Text>
         <TextInput
           secureTextEntry={true}
           style={styles.input}
@@ -142,12 +122,7 @@ export default function SignUp() {
           marginTop: 50,
         }}
       >
-        <Text
-          style={{
-            color: Colors.WHITE,
-            textAlign: "center",
-          }}
-        >
+        <Text style={{ color: Colors.WHITE, textAlign: "center" }}>
           Create Account
         </Text>
       </TouchableOpacity>
@@ -162,12 +137,7 @@ export default function SignUp() {
           borderWidth: 1,
         }}
       >
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-            textAlign: "center",
-          }}
-        >
+        <Text style={{ color: Colors.PRIMARY, textAlign: "center" }}>
           Sign In
         </Text>
       </TouchableOpacity>
@@ -181,6 +151,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.GRAY,
     borderRadius: 15,
-    fontFamily: "outfit",
   },
 });
