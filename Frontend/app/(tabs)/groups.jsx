@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { auth } from '../../configs/FirebaseConfig';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for the Gemini-like icon
 
 const db = getFirestore();
 
 export default function Groups() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [userNames, setUserNames] = useState({});
+  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
+    if (!showContent) return;
+
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userId = user.uid;
         console.log("User is signed in:", userId);
 
+        setLoading(true);
         try {
           const response = await fetch(`http://localhost:8000/recommend/?uuid=${userId}`);
           const result = await response.json();
@@ -53,7 +58,26 @@ export default function Groups() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [showContent]);
+
+  const handleSmartConnectClick = () => {
+    setShowContent(true);
+  };
+
+  if (!showContent) {
+    return (
+      <View style={styles.introContainer}>
+        <Text style={styles.introTitle}>Discover Your Travel Companions</Text>
+        <Text style={styles.introDescription}>
+          Find travelers with similar interests and explore destinations you can enjoy together. Click "Discover Now" to see personalized recommendations based on your preferences.
+        </Text>
+        <TouchableOpacity style={styles.smartConnectButton} onPress={handleSmartConnectClick}>
+          <Ionicons name="sparkles-outline" size={24} color="#fff" style={styles.buttonIcon} />
+          <Text style={styles.smartConnectButtonText}>Discover Now</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   if (loading) {
     return (
@@ -98,13 +122,61 @@ export default function Groups() {
 }
 
 const styles = StyleSheet.create({
+  // Intro Section Styles
+  introContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f7fa',
+    padding: 20,
+  },
+  introTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  introDescription: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 30,
+    paddingHorizontal: 10,
+  },
+  smartConnectButton: {
+    flexDirection: 'row',
+    backgroundColor: '#0478A7',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonIcon: {
+    marginRight: 10,
+  },
+  smartConnectButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
+  },
+
+  // Existing Styles
   container: {
     flex: 1,
-    backgroundColor: '#f5f7fa', // Light gray background for a clean look
+    backgroundColor: '#f5f7fa',
   },
   contentContainer: {
     padding: 20,
-    paddingBottom: 40, // Extra padding at the bottom for scroll
+    paddingBottom: 40,
   },
   loadingContainer: {
     flex: 1,
@@ -115,8 +187,8 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 14,
-    color: '#0478A7', // Matching your app's accent color
-    fontFamily: 'sans-serif-medium', // Optional: Use a custom font if available
+    color: '#0478A7',
+    fontFamily: 'sans-serif-medium',
   },
   sectionTitle: {
     fontSize: 16,
@@ -128,27 +200,25 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    
     padding: 15,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    elevation: 3, // Shadow for Android
+    elevation: 3,
   },
   userItem: {
     paddingVertical: 12,
     paddingHorizontal: 15,
-    backgroundColor: '#e6f3f7', // Light blue for user items
+    backgroundColor: '#e6f3f7',
     borderRadius: 8,
     marginVertical: 5,
-    
   },
   userName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0478A7', // Accent color for names
+    color: '#0478A7',
   },
   placeCard: {
     padding: 15,

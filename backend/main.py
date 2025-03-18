@@ -54,5 +54,5 @@ def recommend(uuid: str):
 
     return {
         "matchingUsers": [user["uuid"] for user in matching_users],
-        "recommendedPlaces": matched_places[:5]
+        "recommendedPlaces": matched_places
     }
