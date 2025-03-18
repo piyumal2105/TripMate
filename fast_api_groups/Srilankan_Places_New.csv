@@ -1,0 +1,331 @@
+Place Name,Category,Location
+Mirissa Beach,Beaches,Matara District
+Unawatuna Beach,Beaches,Galle District
+Bentota Beach,Beaches,Galle District
+Hikkaduwa Beach,Beaches,Galle District
+Nilaveli Beach,Beaches,Trincomalee District
+Arugam Bay Beach,Beaches,Ampara District
+Tangalle Beach,Beaches,Hambantota District
+Pasikuda Beach,Beaches,Batticaloa District
+Kalpitiya Beach,Beaches,Puttalam District
+Negombo Beach,Beaches,Gampaha District
+Galle Fort,Colonial Towns,Galle District
+Jaffna Fort,Colonial Towns,Jaffna District
+Negombo Dutch Fort,Colonial Towns,Gampaha District
+Matara Fort,Colonial Towns,Matara District
+Trincomalee Fort,Colonial Towns,Trincomalee District
+Batticaloa Fort,Colonial Towns,Batticaloa District
+Mannar Fort,Colonial Towns,Mannar District
+Hambantota Salt Pans,Colonial Towns,Hambantota District
+Ratnapura Old Town,Colonial Towns,Ratnapura District
+Colombo Fort,Colonial Towns,Colombo District
+Sigiriya Rock Fortress,Cultural/Heritage Sites,Matale District
+Anuradhapura,Cultural/Heritage Sites,Anuradhapura District
+Polonnaruwa,Cultural/Heritage Sites,Polonnaruwa District
+Dambulla Cave Temples,Cultural/Heritage Sites,Matale District
+Mihintale,Cultural/Heritage Sites,Anuradhapura District
+Kataragama,Cultural/Heritage Sites,Hambantota District
+Buduruwagala,Cultural/Heritage Sites,Monaragala District
+Ritigala Ruins,Cultural/Heritage Sites,Anuradhapura District
+Yapahuwa,Cultural/Heritage Sites,Kurunegala District
+Medirigiriya Vatadage,Cultural/Heritage Sites,Polonnaruwa District
+Peradeniya Botanical Gardens,Gardens,Kandy District
+Hakgala Botanical Garden,Gardens,Nuwara Eliya District
+Brief Garden,Gardens,Kalutara District
+Victoria Park,Gardens,Nuwara Eliya District
+Henarathgoda Botanical Garden,Gardens,Gampaha District
+Mirijjawila Botanical Garden,Gardens,Hambantota District
+Seetha Amman Garden,Gardens,Nuwara Eliya District
+Gampola Royal Garden,Gardens,Kandy District
+Wadduwa Eco Garden,Gardens,Kalutara District
+Colombo Urban Park,Gardens,Colombo District
+Nuwara Eliya,Hill Stations,Nuwara Eliya District
+Ella,Hill Stations,Badulla District
+Haputale,Hill Stations,Badulla District
+Bandarawela,Hill Stations,Badulla District
+Ohiya,Hill Stations,Nuwara Eliya District
+Pussellawa,Hill Stations,Kandy District
+Hatton,Hill Stations,Nuwara Eliya District
+Maskeliya,Hill Stations,Nuwara Eliya District
+Dikoya,Hill Stations,Nuwara Eliya District
+Bogawantalawa,Hill Stations,Nuwara Eliya District
+National Museum Colombo,Museums,Colombo District
+Galle Maritime Museum,Museums,Galle District
+Ceylon Tea Museum,Museums,Kandy District
+Jaffna Archaeological Museum,Museums,Jaffna District
+Folk Museum Kandy,Museums,Kandy District
+Gem Museum Ratnapura,Museums,Ratnapura District
+Martin Wickramasinghe Museum,Museums,Galle District
+Sigiriya Museum,Museums,Matale District
+Anuradhapura Folk Museum,Museums,Anuradhapura District
+Colombo Dutch Museum,Museums,Colombo District
+Sinharaja Forest Reserve,Natural Attractions,Ratnapura District
+Horton Plains,Natural Attractions,Nuwara Eliya District
+Ravana Falls,Natural Attractions,Badulla District
+Madu River,Natural Attractions,Galle District
+Bambarakanda Falls,Natural Attractions,Badulla District
+Dunhinda Falls,Natural Attractions,Badulla District
+Diyaluma Falls,Natural Attractions,Badulla District
+Knuckles Forest,Natural Attractions,Matale District
+Wasgamuwa,Natural Attractions,Polonnaruwa District
+Kitulgala Rainforest,Natural Attractions,Kegalle District
+Ceylon Tea Trails,Tea Plantations,Nuwara Eliya District
+Dambulla Tea Estate,Tea Plantations,Matale District
+Bogoda Tea Estate,Tea Plantations,Badulla District
+Pedro Tea Estate,Tea Plantations,Nuwara Eliya District
+Lipton’s Seat,Tea Plantations,Badulla District
+Hatton Tea Fields,Tea Plantations,Nuwara Eliya District
+Ella Tea Plantation,Tea Plantations,Badulla District
+Pussellawa Tea Estate,Tea Plantations,Kandy District
+Loolecondera Estate,Tea Plantations,Kandy District
+Uva Halpewatte Tea,Tea Plantations,Badulla District
+Temple of the Tooth,Temples,Kandy District
+Koneswaram Temple,Temples,Trincomalee District
+Dambulla Cave Temple,Temples,Matale District
+Gangaramaya Temple,Temples,Colombo District
+Seetha Amman Temple,Temples,Nuwara Eliya District
+Maha Devale,Temples,Kandy District
+Kataragama Temple,Temples,Hambantota District
+Nallur Kandaswamy,Temples,Jaffna District
+Velgam Vehera,Temples,Trincomalee District
+Mulkirigala Raja Maha Vihara,Temples,Hambantota District
+Yala National Park,Wildlife/National Parks,Hambantota District
+Udawalawe National Park,Wildlife/National Parks,Ratnapura District
+Minneriya National Park,Wildlife/National Parks,Polonnaruwa District
+Wilpattu National Park,Wildlife/National Parks,Puttalam District
+Kumana National Park,Wildlife/National Parks,Ampara District
+Wasgamuwa National Park,Wildlife/National Parks,Matale District
+Gal Oya National Park,Wildlife/National Parks,Ampara District
+Bundala National Park,Wildlife/National Parks,Hambantota District
+Horton Plains National Park,Wildlife/National Parks,Nuwara Eliya District
+Maduru Oya National Park,Wildlife/National Parks,Polonnaruwa District
+Adam’s Peak,Mountains,Ratnapura District
+Pidurutalagala,Mountains,Nuwara Eliya District
+Knuckles Range,Mountains,Matale District
+Samanala Kanda,Mountains,Ratnapura District
+Ella Rock,Mountains,Badulla District
+Namunukula,Mountains,Badulla District
+Hanthana Range,Mountains,Kandy District
+Bible Rock,Mountains,Kegalle District
+Kirigalpotta,Mountains,Nuwara Eliya District
+Thotupola Kanda,Mountains,Nuwara Eliya District
+Ella Rock,Hiking,Badulla District
+Little Adam’s Peak,Hiking,Badulla District
+Adam’s Peak Trail,Hiking,Ratnapura District
+Knuckles Range Trail,Hiking,Matale District
+Nine Arches Bridge,Hiking,Badulla District
+Hanthana Trek,Hiking,Kandy District
+Pekoe Trail,Hiking,Nuwara Eliya District
+Haputale Ridge,Hiking,Badulla District
+Ritigala Hike,Hiking,Anuradhapura District
+Sinharaja Trek,Hiking,Ratnapura District
+Arugam Bay,Adventure Sports,Ampara District
+Hikkaduwa Coral Reef,Adventure Sports,Galle District
+Kalpitiya Kitesurfing,Adventure Sports,Puttalam District
+Kitulgala White Water Rafting,Adventure Sports,Kegalle District
+Bentota Watersports,Adventure Sports,Galle District
+Mirissa Whale Watching,Adventure Sports,Matara District
+Ella Zip Lining,Adventure Sports,Badulla District
+Trincomalee Diving,Adventure Sports,Trincomalee District
+Negombo Fishing,Adventure Sports,Gampaha District
+Sigiriya Hot Air Ballooning,Adventure Sports,Matale District
+Weligama Beach,Beaches,Matara District
+Pigeon Island Beach,Beaches,Trincomalee District
+Kalkudah Beach,Beaches,Batticaloa District
+Jungle Beach,Beaches,Trincomalee District
+Beruwala Beach,Beaches,Kalutara District
+Mount Lavinia Beach,Beaches,Colombo District
+Koggala Beach,Beaches,Galle District
+Rekawa Beach,Beaches,Hambantota District
+Dickwella Beach,Beaches,Matara District
+Polhena Beach,Beaches,Matara District
+Kalutara Fort,Colonial Towns,Kalutara District
+Ambalangoda Old Town,Colonial Towns,Galle District
+Puttalam Dutch Remains,Colonial Towns,Puttalam District
+Mullaitivu Ruins,Colonial Towns,Mullaitivu District
+Kurunegala Colonial Quarter,Colonial Towns,Kurunegala District
+Badulla Old Town,Colonial Towns,Badulla District
+Kandy Colonial Buildings,Colonial Towns,Kandy District
+Nuwara Eliya Post Office,Colonial Towns,Nuwara Eliya District
+Gampaha Old Town,Colonial Towns,Gampaha District
+Hakgala Old Settlement,Colonial Towns,Nuwara Eliya District
+Somawathiya,Cultural/Heritage Sites,Polonnaruwa District
+Maligawila Buddha Statue,Cultural/Heritage Sites,Monaragala District
+Ruwanwelisaya,Cultural/Heritage Sites,Anuradhapura District
+Jetavanaramaya,Cultural/Heritage Sites,Anuradhapura District
+Abhayagiri Dagoba,Cultural/Heritage Sites,Anuradhapura District
+Gal Vihara,Cultural/Heritage Sites,Polonnaruwa District
+Rankoth Vehera,Cultural/Heritage Sites,Polonnaruwa District
+Lankatilaka Vihara,Cultural/Heritage Sites,Polonnaruwa District
+Tissamaharama Stupa,Cultural/Heritage Sites,Hambantota District
+Sandakada Pahana,Cultural/Heritage Sites,Anuradhapura District
+Royal Botanical Garden,Gardens,Kandy District
+Udawattakele Forest Garden,Gardens,Kandy District
+Lunuganga Estate,Gardens,Galle District
+Kanneliya Garden,Gardens,Galle District
+Popham’s Arboretum,Gardens,Matale District
+Diyatha Uyana,Gardens,Colombo District
+Welisara Eco Park,Gardens,Gampaha District
+Hambantota Urban Park,Gardens,Hambantota District
+Trincomalee Coastal Garden,Gardens,Trincomalee District
+Ella Flower Garden,Gardens,Badulla District
+Ambewela,Hill Stations,Nuwara Eliya District
+Kandapola,Hill Stations,Nuwara Eliya District
+Agarapatana,Hill Stations,Nuwara Eliya District
+Idalgashinna,Hill Stations,Badulla District
+Laxapana,Hill Stations,Nuwara Eliya District
+Ramboda,Hill Stations,Nuwara Eliya District
+Talawakelle,Hill Stations,Nuwara Eliya District
+Kotmale,Hill Stations,Nuwara Eliya District
+Radella,Hill Stations,Nuwara Eliya District
+Pattipola,Hill Stations,Badulla District
+Polonnaruwa Museum,Museums,Polonnaruwa District
+Kandy Garrison Museum,Museums,Kandy District
+Ratnapura National Museum,Museums,Ratnapura District
+Trincomalee War Museum,Museums,Trincomalee District
+Hambantota Heritage Museum,Museums,Hambantota District
+Batticaloa Folk Museum,Museums,Batticaloa District
+Negombo Fisheries Museum,Museums,Gampaha District
+Ambalangoda Mask Museum,Museums,Galle District
+Matara Star Fort Museum,Museums,Matara District
+Jaffna Nallur Museum,Museums,Jaffna District
+Baker’s Falls,Natural Attractions,Nuwara Eliya District
+Laxapana Falls,Natural Attractions,Nuwara Eliya District
+St. Clair’s Falls,Natural Attractions,Nuwara Eliya District
+Devon Falls,Natural Attractions,Nuwara Eliya District
+Aberdeen Falls,Natural Attractions,Nuwara Eliya District
+Rawana Cave,Natural Attractions,Badulla District
+Madolsima,Natural Attractions,Badulla District
+Hakgala Strict Reserve,Natural Attractions,Nuwara Eliya District
+Galway’s Land,Natural Attractions,Nuwara Eliya District
+Ella Gap,Natural Attractions,Badulla District
+Lover’s Leap,Tea Plantations,Nuwara Eliya District
+Labookellie Estate,Tea Plantations,Nuwara Eliya District
+Glenloch Tea Factory,Tea Plantations,Nuwara Eliya District
+Blue Field Tea Garden,Tea Plantations,Nuwara Eliya District
+Talawakelle Tea Estate,Tea Plantations,Nuwara Eliya District
+Kotmale Tea Fields,Tea Plantations,Nuwara Eliya District
+Ramboda Tea Plantation,Tea Plantations,Nuwara Eliya District
+Haputale Tea Estate,Tea Plantations,Badulla District
+Maskeliya Tea Fields,Tea Plantations,Nuwara Eliya District
+Dikoya Tea Estate,Tea Plantations,Nuwara Eliya District
+Kelani Valley Temple,Temples,Colombo District
+Sri Ponnambalawaneswarar,Temples,Colombo District
+Vishnu Kovil,Temples,Jaffna District
+Nagadeepa Purana Vihara,Temples,Jaffna District
+Muthiyangana Raja Maha Vihara,Temples,Badulla District
+Mahiyangana Temple,Temples,Badulla District
+Sithulpawwa,Temples,Hambantota District
+Degaldoruwa Raja Maha Vihara,Temples,Kandy District
+Lankatilaka Temple,Temples,Kandy District
+Embekka Devalaya,Temples,Kandy District
+Chundikulam Bird Sanctuary,Wildlife/National Parks,Jaffna District
+Pigeon Island National Park,Wildlife/National Parks,Trincomalee District
+Kaudulla National Park,Wildlife/National Parks,Polonnaruwa District
+Lahugala Kitulana Park,Wildlife/National Parks,Ampara District
+Hikkaduwa National Park,Wildlife/National Parks,Galle District
+Rekawa Turtle Sanctuary,Wildlife/National Parks,Hambantota District
+Adam’s Bridge Marine Park,Wildlife/National Parks,Mannar District
+Angammedilla National Park,Wildlife/National Parks,Polonnaruwa District
+Flood Plains National Park,Wildlife/National Parks,Polonnaruwa District
+Tabbowa Sanctuary,Wildlife/National Parks,Puttalam District
+Hanthana Peak,Mountains,Kandy District
+Gongala Mountain,Mountains,Ratnapura District
+Suriyakanda,Mountains,Matara District
+Rakwana Hills,Mountains,Ratnapura District
+Ohiya Peak,Mountains,Nuwara Eliya District
+Haputale Range,Mountains,Badulla District
+Dothalugala,Mountains,Badulla District
+Bambaragala Peak,Mountains,Badulla District
+Kaburagala,Mountains,Monaragala District
+Mandagala Peak,Mountains,Kandy District
+World’s End,Hiking,Nuwara Eliya District
+Meemure Trek,Hiking,Matale District
+Kitulgala Forest Trail,Hiking,Kegalle District
+Ohiya to Bambarakanda,Hiking,Nuwara Eliya District
+Dunhinda Falls Trail,Hiking,Badulla District
+Lipton’s Seat Trek,Hiking,Badulla District
+Hakgala Mountain Hike,Hiking,Nuwara Eliya District
+Namunukula Trail,Hiking,Badulla District
+Samanala Kanda Hike,Hiking,Ratnapura District
+Bible Rock Trek,Hiking,Kegalle District
+Weligama Surfing,Adventure Sports,Matara District
+Unawatuna Diving,Adventure Sports,Galle District
+Pottuvil Point Surfing,Adventure Sports,Ampara District
+Kalutara Kayaking,Adventure Sports,Kalutara District
+Matara Snorkeling,Adventure Sports,Matara District
+Tangalle Surfing,Adventure Sports,Hambantota District
+Colombo Jet Skiing,Adventure Sports,Colombo District
+Haputale Paragliding,Adventure Sports,Badulla District
+Koggala Windsurfing,Adventure Sports,Galle District
+Batticaloa Lagoon Boating,Adventure Sports,Batticaloa District
+Marble Beach,Beaches,Trincomalee District
+Hiriketiya Beach,Beaches,Matara District
+ Uppuveli Beach,Beaches,Trincomalee District
+Thalpe Beach,Beaches,Galle District
+Goyambokka Beach,Beaches,Hambantota District
+Mawella Beach,Beaches,Hambantota District
+Panama Beach,Beaches,Ampara District
+Kuchchaveli Beach,Beaches,Trincomalee District
+Induruwa Beach,Beaches,Galle District
+Kosgoda Beach,Beaches,Galle District
+Star Fort Matara,Colonial Towns,Matara District
+Point Pedro Remains,Colonial Towns,Jaffna District
+Tangalle Old Town,Colonial Towns,Hambantota District
+Beruwala Lighthouse,Colonial Towns,Kalutara District
+Ella Colonial Bungalows,Colonial Towns,Badulla District
+Haputale Old Estates,Colonial Towns,Badulla District
+Bandarawela Colonial Quarter,Colonial Towns,Badulla District
+Mannar Dutch Fort,Colonial Towns,Mannar District
+Koggala Old Settlement,Colonial Towns,Galle District
+Pettah Market Area,Colonial Towns,Colombo District
+Kala Oya Ruins,Cultural/Heritage Sites,Puttalam District
+Panduwanwila,Cultural/Heritage Sites,Anuradhapura District
+Dimbulagala,Cultural/Heritage Sites,Polonnaruwa District
+Seruwawila Stupa,Cultural/Heritage Sites,Trincomalee District
+Kudumbigala,Cultural/Heritage Sites,Ampara District
+Batticaloa Heritage Site,Cultural/Heritage Sites,Batticaloa District
+Arankele Monastery,Cultural/Heritage Sites,Kurunegala District
+Avukana Buddha,Cultural/Heritage Sites,Anuradhapura District
+Maha Saman Devalaya,Cultural/Heritage Sites,Ratnapura District
+Kuragala Rock,Cultural/Heritage Sites,Kegalle District
+Gangaramaya Park,Gardens,Colombo District
+Talangama Wetland,Gardens,Colombo District
+Maduganga Garden,Gardens,Galle District
+Weligama Coastal Park,Gardens,Matara District
+Jaffna Public Garden,Gardens,Jaffna District
+Anawilundawa Sanctuary,Gardens,Puttalam District
+Matale Spice Garden,Gardens,Matale District
+Kandy Lake Garden,Gardens,Kandy District
+Ratnapura Eco Garden,Gardens,Ratnapura District
+Badulla Urban Park,Gardens,Badulla District
+Shanthipura,Hill Stations,Nuwara Eliya District
+Dayagama,Hill Stations,Nuwara Eliya District
+Mandaram Nuwara,Hill Stations,Kandy District
+Illukkumbura,Hill Stations,Matale District
+Loolkandura,Hill Stations,Nuwara Eliya District
+Norton Bridge,Hill Stations,Nuwara Eliya District
+Ginigathhena,Hill Stations,Nuwara Eliya District
+Meepilimana,Hill Stations,Nuwara Eliya District
+Kothduwa,Hill Stations,Badulla District
+Passara,Hill Stations,Badulla District
+Ella Heritage Museum,Museums,Badulla District
+Kurunegala Museum,Museums,Kurunegala District
+Monaragala Heritage Museum,Museums,Monaragala District
+Puttalam Salt Museum,Museums,Puttalam District
+Kalutara Bodhiya Museum,Museums,Kalutara District
+Kegalle Cultural Museum,Museums,Kegalle District
+Mannar Island Museum,Museums,Mannar District
+Mirissa Fisheries Museum,Museums,Matara District
+Hakgala Nature Museum,Museums,Nuwara Eliya District
+Tangalle Maritime Museum,Museums,Hambantota District
+Bomburu Ella,Natural Attractions,Badulla District
+Surathali Falls,Natural Attractions,Badulla District
+Kirindi Ella,Natural Attractions,Nuwara Eliya District
+Kolapathana Falls,Natural Attractions,Nuwara Eliya District
+Sari Falls,Natural Attractions,Badulla District
+Madu Ganga Wetland,Natural Attractions,Galle District
+Kelani River,Natural Attractions,Colombo District
+Attidiya Bird Sanctuary,Natural Attractions,Colombo District
+Kanneliya Forest,Natural Attractions,Galle District
+Muthurajawela Marsh,Natural Attractions,Gampaha District
