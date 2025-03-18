@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { auth } from '../../configs/FirebaseConfig';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for the Gemini-like icon
+import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for icons
 
 const db = getFirestore();
 
@@ -12,6 +12,43 @@ export default function Groups() {
   const [userNames, setUserNames] = useState({});
   const [showContent, setShowContent] = useState(false);
 
+  // Function to fetch recommendations
+  const fetchRecommendations = async (userId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8000/recommend/?uuid=${userId}`);
+      const result = await response.json();
+      console.log('API Response:', result);
+      setData(result);
+
+      if (result.matchingUsers && result.matchingUsers.length > 0) {
+        const namePromises = result.matchingUsers.map(async (uuid) => {
+          const userDoc = await getDoc(doc(db, "users", uuid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            return { uuid, name: userData.fullName || "Unknown User" };
+          }
+          return { uuid, name: "Unknown User" };
+        });
+
+        const resolvedNames = await Promise.all(namePromises);
+        const nameMap = resolvedNames.reduce((acc, { uuid, name }) => {
+          acc[uuid] = name;
+          return acc;
+        }, {});
+        setUserNames(nameMap);
+      } else {
+        setUserNames({});
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setData({ error: 'Failed to fetch data' });
+      setUserNames({});
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!showContent) return;
 
@@ -19,37 +56,7 @@ export default function Groups() {
       if (user) {
         const userId = user.uid;
         console.log("User is signed in:", userId);
-
-        setLoading(true);
-        try {
-          const response = await fetch(`http://localhost:8000/recommend/?uuid=${userId}`);
-          const result = await response.json();
-          console.log('API Response:', result);
-          setData(result);
-
-          if (result.matchingUsers && result.matchingUsers.length > 0) {
-            const namePromises = result.matchingUsers.map(async (uuid) => {
-              const userDoc = await getDoc(doc(db, "users", uuid));
-              if (userDoc.exists()) {
-                const userData = userDoc.data();
-                return { uuid, name: userData.fullName || "Unknown User" };
-              }
-              return { uuid, name: "Unknown User" };
-            });
-
-            const resolvedNames = await Promise.all(namePromises);
-            const nameMap = resolvedNames.reduce((acc, { uuid, name }) => {
-              acc[uuid] = name;
-              return acc;
-            }, {});
-            setUserNames(nameMap);
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error);
-          setData({ error: 'Failed to fetch data' });
-        } finally {
-          setLoading(false);
-        }
+        fetchRecommendations(userId);
       } else {
         console.log('User is not logged in');
         setData({ error: 'User not logged in' });
@@ -62,6 +69,16 @@ export default function Groups() {
 
   const handleSmartConnectClick = () => {
     setShowContent(true);
+  };
+
+  const handleRediscoverClick = () => {
+    const user = auth.currentUser;
+    if (user) {
+      fetchRecommendations(user.uid); // Re-run the API call
+    } else {
+      console.log('No user logged in for rediscovery');
+      setData({ error: 'User not logged in' });
+    }
   };
 
   if (!showContent) {
@@ -117,6 +134,12 @@ export default function Groups() {
           <Text style={styles.noDataText}>No recommended places available.</Text>
         )}
       </View>
+
+      {/* Re-Discover Button */}
+      <TouchableOpacity style={styles.rediscoverButton} onPress={handleRediscoverClick}>
+        <Ionicons name="refresh-outline" size={24} color="#fff" style={styles.buttonIcon} />
+        <Text style={styles.rediscoverButtonText}>Discover Again</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -250,5 +273,28 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 10,
+  },
+  // Re-Discover Button Styles
+  rediscoverButton: {
+    flexDirection: 'row',
+    backgroundColor: '#0478A7',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center', // Center horizontally
+    marginTop: 20,
+  },
+  rediscoverButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
   },
 });
