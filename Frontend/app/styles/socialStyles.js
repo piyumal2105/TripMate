@@ -135,53 +135,47 @@ export const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   addPostButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0478A7', // Changed to your accent color
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 16,
     textAlign: 'center',
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 12,
   },
   cancelButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#888', // Changed to gray
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 16,
     textAlign: 'center',
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 12,
   },
-  container: { flex: 1, padding: 10 },
-  fakeInput: { padding: 10, borderWidth: 1, borderRadius: 10, marginBottom: 10 },
-  categoryContainer: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 5 },
-  categoryTag: { backgroundColor: '#ddd', padding: 5, borderRadius: 10, margin: 2 },
-  categoryButton: { padding: 8, borderRadius: 10, margin: 5, backgroundColor: '#eee' },
-  selectedCategory: { backgroundColor: '#007BFF', color: 'white' },
-  modalContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-  modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10 },
   categoryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 10,
   },
-  
   categoryButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#eee',
     paddingVertical: 8,
     paddingHorizontal: 12,
     margin: 5,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
-  
   categorySelected: {
-    backgroundColor: '#007BFF', // Change to highlight selected category
+    borderColor: '#0478A7', // Selected border color
+    backgroundColor: '#e6f3f7', // Light blue background for selected
   },
-  
   categoryText: {
-    color: 'white',
+    fontSize: 12,
+    color: '#333',
     fontWeight: 'bold',
   },
-  
+  categoryTextSelected: {
+    color: '#0478A7', // Selected text color
+  },
 });
-

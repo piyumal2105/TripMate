@@ -263,7 +263,7 @@ const toggleCategory = (category) => {
                 onPress={handlePostSubmit}
               >
                 <Text style={styles.addPostButton}>
-                  {editingPost ? 'Update Post' : 'Add Post'}
+                  {editingPost ? 'Update' : 'Add Post'}
                 </Text>
               </TouchableOpacity>
             </View>
