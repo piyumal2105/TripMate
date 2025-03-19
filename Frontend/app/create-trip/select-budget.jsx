@@ -1,72 +1,97 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { Colors } from "./../../constants/Colors"; // Adjust the path if needed
-import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon library
-import { useRouter } from "expo-router"; // Import useRouter from expo-router
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Colors } from "./../../constants/Colors";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { auth, db } from "../../configs/FirebaseConfig";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 
 export default function SelectBudget() {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
+  const [selectedBudget, setSelectedBudget] = useState(null);
 
-  // Function to handle "Next" button click and navigate to next page
-  const handleNext = () => {
-    // Redirect to the "select-activity" page
-    router.push("/create-trip/select-act"); // Change the route as per your structure
+  const handleNext = async () => {
+    if (!selectedBudget) {
+      alert("Please select a budget option.");
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("User not authenticated!");
+      return;
+    }
+
+    const userPreferencesRef = doc(db, "preferences", user.uid);
+
+    try {
+      const docSnap = await getDoc(userPreferencesRef);
+
+      if (docSnap.exists()) {
+        await updateDoc(userPreferencesRef, { budget: selectedBudget });
+      } else {
+        await setDoc(userPreferencesRef, {
+          budget: selectedBudget,
+          startDate: "",
+          endDate: "",
+          preferences: [],
+        });
+      }
+
+      console.log("Budget selection saved:", selectedBudget);
+      router.push("/create-trip/recommendations");
+    } catch (error) {
+      console.error("Error updating budget selection:", error);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Backward Icon at the top-left */}
-      <TouchableOpacity style={styles.backButton}>
+    <LinearGradient colors={["#FFFFFF", "#F5F5F5"]} style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Icon name="arrow-back" size={30} color={Colors.DARK} />
       </TouchableOpacity>
 
-      {/* Header */}
       <Text style={styles.header}>Select Your Budget</Text>
 
-      {/* Budget Options */}
       <View style={styles.cardContainer}>
-        {/* Normal Budget */}
-        <TouchableOpacity style={[styles.card, styles.normalCard]}>
-          <Image
-            source={{
-              uri: "https://example.com/normal-budget-image.jpg", // Replace with an actual image URL
-            }}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Normal</Text>
-          <Text style={styles.cardDescription}>Affordable options</Text>
-        </TouchableOpacity>
-
-        {/* Moderate Budget */}
-        <TouchableOpacity style={[styles.card, styles.moderateCard]}>
-          <Image
-            source={{
-              uri: "https://example.com/moderate-budget-image.jpg", // Replace with an actual image URL
-            }}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Moderate</Text>
-          <Text style={styles.cardDescription}>Comfort and convenience</Text>
-        </TouchableOpacity>
-
-        {/* Expensive Budget */}
-        <TouchableOpacity style={[styles.card, styles.expensiveCard]}>
-          <Image
-            source={{
-              uri: "https://example.com/expensive-budget-image.jpg", // Replace with an actual image URL
-            }}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Expensive</Text>
-          <Text style={styles.cardDescription}>Luxury</Text>
-        </TouchableOpacity>
+        {[
+          { id: "cheap", title: "Budget", color: "#D1FAE5" },
+          { id: "moderate", title: "Moderate", color: "#FDE68A" },
+          { id: "luxury", title: "Luxury", color: "#FBCFE8" },
+        ].map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={[
+              styles.card,
+              { backgroundColor: item.color },
+              selectedBudget === item.id && styles.selectedCard,
+            ]}
+            onPress={() => setSelectedBudget(item.id)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.cardTitle}>{item.title}</Text>
+            {selectedBudget === item.id && (
+              <Icon
+                name="check-circle"
+                size={26}
+                color={Colors.SUCCESS}
+                style={styles.checkIcon}
+              />
+            )}
+          </TouchableOpacity>
+        ))}
       </View>
 
-      {/* Next Button with Navigation */}
-      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-        <Text style={styles.nextButtonText}>Next</Text>
+      <TouchableOpacity
+        style={[styles.nextButton, !selectedBudget && styles.disabledButton]}
+        onPress={handleNext}
+        disabled={!selectedBudget}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.nextButtonText}>Continue</Text>
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -74,90 +99,70 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: Colors.WHITE,
-    justifyContent: "center",
-    alignItems: "center", // Center align the cards and content
-  },
-  header: {
-    fontFamily: "outfit-bold",
-    fontSize: 32,
-    textAlign: "center",
-    color: Colors.DARK,
-    marginBottom: 40,
-  },
-  cardContainer: {
-    flexDirection: "row", // Align cards horizontally
-    justifyContent: "space-between", // Space the cards evenly
-    width: "100%",
-    marginTop: 30,
-  },
-  card: {
-    width: "30%", // Make each card take 30% of the screen width
-    height: 280, // Adjust the height to make it look more balanced
-    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    padding: 15,
-    elevation: 5, // Shadow for Android
-    shadowColor: "#000", // Shadow for iOS
-    shadowOffset: { width: 0, height: 5 },
+  },
+  header: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: Colors.DARK,
+    marginBottom: 140,
+  },
+  cardContainer: {
+    width: "100%",
+    alignItems: "center",
+  },
+  card: {
+    width: "90%",
+    padding: 20,
+    borderRadius: 25,
+    marginBottom: 15,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    elevation: 3,
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    overflow: "hidden", // Prevents image from spilling over the border radius
-    transition: "all 0.3s ease-in-out", // Smooth transition on hover/tap
   },
-  normalCard: {
-    backgroundColor: "#B2EBF2", // Light blue for normal budget
-  },
-  moderateCard: {
-    backgroundColor: "#FFE0B2", // Light orange for moderate budget
-  },
-  expensiveCard: {
-    backgroundColor: "#FFEBEE", // Light pink for expensive budget
-  },
-  cardImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50, // Round the image to make it look more appealing
-    marginBottom: 15,
+  selectedCard: {
+    borderWidth: 3,
+    borderColor: Colors.PRIMARY,
+    shadowOpacity: 0.3,
   },
   cardTitle: {
-    fontFamily: "outfit-bold",
-    fontSize: 20,
+    fontSize: 22,
+    fontWeight: "600",
     color: Colors.DARK,
-    textAlign: "center",
-    marginBottom: 5,
   },
-  cardDescription: {
-    fontFamily: "outfit-medium",
-    fontSize: 14,
-    color: "#555",
-    textAlign: "center",
+  checkIcon: {
+    marginLeft: 10,
   },
   nextButton: {
     padding: 15,
     backgroundColor: Colors.PRIMARY,
-    borderRadius: 15,
+    borderRadius: 20,
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 30,
     width: "80%",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   nextButtonText: {
     color: Colors.WHITE,
-    fontFamily: "outfit-medium",
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: "600",
   },
   backButton: {
     position: "absolute",
-    top: 40, // Position the back button at the top-left
-    left: 20,
+    top: 5,
+    left: 0,
     padding: 10,
-    backgroundColor: Colors.WHITE,
-    borderRadius: 50,
-    elevation: 5, // Shadow for Android
-    shadowColor: "#000", // Shadow for iOS
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
   },
 });
