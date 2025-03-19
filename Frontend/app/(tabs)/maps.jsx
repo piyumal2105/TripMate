@@ -219,11 +219,11 @@ export default function Maps() {
               <Text style={styles.placeDetails}>
                 🌏 Province: {place.province || "N/A"} Province
               </Text>
-              <Text style={styles.placeDetails}>
+              {/* <Text style={styles.placeDetails}>
                 📊 Coordinates:{" "}
                 {place.latitude !== undefined ? place.latitude : "N/A"},{" "}
                 {place.longitude !== undefined ? place.longitude : "N/A"}
-              </Text>
+              </Text> */}
               <Text style={styles.placeDescription}>
                 {place.description || "No description available."}
               </Text>
