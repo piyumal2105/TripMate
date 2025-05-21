@@ -8,29 +8,26 @@ import {
   TouchableOpacity,
   Platform,
   Dimensions,
-  Alert,
+  Linking,
 } from "react-native";
 import axios from "axios";
 import { auth } from "../../configs/FirebaseConfig.js";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import * as Location from "expo-location";
 
 const db = getFirestore();
 const { width } = Dimensions.get("window");
 
+const SRI_LANKA_BOUNDS = {
+  northEast: { latitude: 9.9, longitude: 81.9 },
+  southWest: { latitude: 5.9, longitude: 79.5 },
+};
+
 const SRI_LANKA_CENTER = {
   latitude: 7.8731,
   longitude: 80.7718,
-  latitudeDelta: 2.5,
-  longitudeDelta: 2.5,
-};
-
-const COLOMBO_CENTER = {
-  latitude: 6.9271,
-  longitude: 79.8612,
-  latitudeDelta: 0.1,
-  longitudeDelta: 0.1,
+  latitudeDelta: 4.5,
+  longitudeDelta: 4.5,
 };
 
 const WebMap = ({ places, selectedPlace, onSelectPlace }) => {
@@ -80,63 +77,59 @@ const WebMap = ({ places, selectedPlace, onSelectPlace }) => {
     }
   }, [selectedPlace]);
 
+  const openInteractiveMap = () => {
+    let url = "https://www.openstreetmap.org/#map=8/7.8731/80.7718";
+    if (selectedPlace && selectedPlace.latitude && selectedPlace.longitude) {
+      const lat = parseFloat(selectedPlace.latitude);
+      const lng = parseFloat(selectedPlace.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        url = `https://www.openstreetmap.org/#map=15/${lat}/${lng}&layers=N`;
+      }
+    }
+    Linking.openURL(url).catch((err) =>
+      console.error("Failed to open URL:", err)
+    );
+  };
+
   return (
-    <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }}></div>
+    <View style={{ width: "100%", height: "100%" }}>
+      <div ref={mapContainerRef} style={{ width: "100%", height: "90%" }}></div>
+      <TouchableOpacity
+        style={styles.interactiveMapButton}
+        onPress={openInteractiveMap}
+      >
+        <Text style={styles.interactiveMapButtonText}>
+          View on OpenStreetMap (Zoom & Pan)
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
   if (Platform.OS === "web") return null;
 
-  const [region, setRegion] = useState(SRI_LANKA_CENTER);
-  const [locationPermission, setLocationPermission] = useState(null);
-  const [userLocation, setUserLocation] = useState(null);
-  const [locationError, setLocationError] = useState(null);
   const mapRef = useRef(null);
-
   useEffect(() => {
-    (async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        setLocationPermission(status === "granted");
-
-        if (status === "granted") {
-          try {
-            const location = await Location.getCurrentPositionAsync({
-              accuracy: Location.Accuracy.Balanced,
-              timeInterval: 5000,
-              distanceInterval: 10,
-            });
-
-            setUserLocation({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            });
-
-            console.log("User location obtained:", location.coords);
-          } catch (error) {
-            console.log("Error getting location:", error);
-            setLocationError(
-              "Could not get your location. Using default location."
-            );
-            if (__DEV__) {
-              console.log("Using mock location for development");
-              setUserLocation({
-                latitude: COLOMBO_CENTER.latitude,
-                longitude: COLOMBO_CENTER.longitude,
-              });
-            }
-          }
-        } else {
-          setLocationError("Location permission denied");
+    if (mapRef.current) {
+      mapRef.current.fitToCoordinates(
+        [
+          {
+            latitude: SRI_LANKA_BOUNDS.northEast.latitude,
+            longitude: SRI_LANKA_BOUNDS.northEast.longitude,
+          },
+          {
+            latitude: SRI_LANKA_BOUNDS.southWest.latitude,
+            longitude: SRI_LANKA_BOUNDS.southWest.longitude,
+          },
+        ],
+        {
+          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          animated: false,
         }
-      } catch (error) {
-        console.log("Error requesting permissions:", error);
-        setLocationError("Error requesting location permissions");
-      }
-    })();
+      );
+    }
   }, []);
-
   useEffect(() => {
     if (selectedPlace && selectedPlace.latitude && selectedPlace.longitude) {
       const lat = parseFloat(selectedPlace.latitude);
@@ -150,27 +143,46 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           longitudeDelta: 0.25,
         };
 
-        setRegion(newRegion);
         if (mapRef.current) {
           mapRef.current.animateToRegion(newRegion, 1000);
         }
+      } else {
+        mapRef.current.fitToCoordinates(
+          [
+            {
+              latitude: SRI_LANKA_BOUNDS.northEast.latitude,
+              longitude: SRI_LANKA_BOUNDS.northEast.longitude,
+            },
+            {
+              latitude: SRI_LANKA_BOUNDS.southWest.latitude,
+              longitude: SRI_LANKA_BOUNDS.southWest.longitude,
+            },
+          ],
+          {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+            animated: true,
+          }
+        );
       }
     } else {
-      if (userLocation) {
-        const newRegion = {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.5,
-        };
-
-        setRegion(newRegion);
-        if (mapRef.current && !selectedPlace) {
-          mapRef.current.animateToRegion(newRegion, 1000);
+      mapRef.current.fitToCoordinates(
+        [
+          {
+            latitude: SRI_LANKA_BOUNDS.northEast.latitude,
+            longitude: SRI_LANKA_BOUNDS.northEast.longitude,
+          },
+          {
+            latitude: SRI_LANKA_BOUNDS.southWest.latitude,
+            longitude: SRI_LANKA_BOUNDS.southWest.longitude,
+          },
+        ],
+        {
+          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          animated: true,
         }
-      }
+      );
     }
-  }, [selectedPlace, userLocation]);
+  }, [selectedPlace]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -178,24 +190,16 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        initialRegion={region}
-        showsUserLocation={locationPermission === true}
-        showsMyLocationButton={true}
+        initialRegion={SRI_LANKA_CENTER}
+        zoomEnabled={true}
+        scrollEnabled={true}
+        zoomTapEnabled={true}
+        zoomControlEnabled={true}
         toolbarEnabled={true}
         moveOnMarkerPress={false}
         showsCompass={true}
         showsScale={true}
       >
-        {userLocation && (
-          <Marker
-            coordinate={{
-              latitude: userLocation.latitude,
-              longitude: userLocation.longitude,
-            }}
-            title="You are here"
-            pinColor="#2196F3"
-          />
-        )}
         {places.map((place, index) => {
           if (place.latitude && place.longitude) {
             const lat = parseFloat(place.latitude);
@@ -220,11 +224,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           return null;
         })}
       </MapView>
-      {locationError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorBannerText}>{locationError}</Text>
-        </View>
-      )}
     </View>
   );
 };
@@ -387,8 +386,6 @@ export default function Maps() {
           <Text>No travel categories selected.</Text>
         )}
       </View>
-
-      {/* Map View */}
       <Text style={styles.header}>Explore Sri Lanka</Text>
       <View
         ref={Platform.OS === "web" ? mapContainerRef : null}
@@ -489,6 +486,18 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  interactiveMapButton: {
+    backgroundColor: "#0478A7",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+    alignItems: "center",
+  },
+  interactiveMapButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
   recommendationsContainer: {
     marginTop: 10,
     marginBottom: 20,
@@ -531,18 +540,5 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 16,
-  },
-  errorBanner: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(255, 0, 0, 0.7)",
-    padding: 5,
-  },
-  errorBannerText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 12,
   },
 });
