@@ -110,6 +110,9 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
   if (Platform.OS === "web") return null;
 
   const mapRef = useRef(null);
+  // Create a ref to store marker references
+  const markerRefs = useRef({});
+
   useEffect(() => {
     if (mapRef.current) {
       mapRef.current.fitToCoordinates(
@@ -130,6 +133,7 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
       );
     }
   }, []);
+
   useEffect(() => {
     if (selectedPlace && selectedPlace.latitude && selectedPlace.longitude) {
       const lat = parseFloat(selectedPlace.latitude);
@@ -145,6 +149,14 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
 
         if (mapRef.current) {
           mapRef.current.animateToRegion(newRegion, 1000);
+        }
+
+        // Show the callout for the selected place
+        const selectedIndex = places.findIndex(
+          (place) => place.name === selectedPlace.name
+        );
+        if (markerRefs.current[selectedIndex]) {
+          markerRefs.current[selectedIndex].showCallout();
         }
       } else {
         mapRef.current.fitToCoordinates(
@@ -164,7 +176,8 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           }
         );
       }
-    } else {
+    } else if (places.length > 0) {
+      // If no place is selected, show the callout for the first place by default
       mapRef.current.fitToCoordinates(
         [
           {
@@ -181,8 +194,12 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           animated: true,
         }
       );
+      // Show callout for the first marker
+      if (markerRefs.current[0]) {
+        markerRefs.current[0].showCallout();
+      }
     }
-  }, [selectedPlace]);
+  }, [selectedPlace, places]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -209,6 +226,7 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
               return (
                 <Marker
                   key={index}
+                  ref={(ref) => (markerRefs.current[index] = ref)} // Store marker ref
                   coordinate={{
                     latitude: lat,
                     longitude: lng,
@@ -216,7 +234,13 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
                   title={place.name}
                   description={place.category || "Tourist Destination"}
                   pinColor={selectedPlace === place ? "#0478A7" : "#FF0000"}
-                  onPress={() => onSelectPlace(place)}
+                  onPress={() => {
+                    onSelectPlace(place);
+                    // Show callout when marker is pressed
+                    if (markerRefs.current[index]) {
+                      markerRefs.current[index].showCallout();
+                    }
+                  }}
                 />
               );
             }
