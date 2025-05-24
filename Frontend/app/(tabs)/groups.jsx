@@ -33,7 +33,9 @@ export default function Groups() {
 
         const resolvedNames = await Promise.all(namePromises);
         const nameMap = resolvedNames.reduce((acc, { uuid, name }) => {
-          acc[uuid] = name;
+          if (name !== "Unknown User") {
+            acc[uuid] = name;
+          }
           return acc;
         }, {});
         setUserNames(nameMap);
@@ -109,12 +111,15 @@ export default function Groups() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.sectionTitle}>Suggested Travellers for You</Text>
       <View style={styles.card}>
-        {data?.matchingUsers?.length > 0 ? (
-          data.matchingUsers.map((uuid, index) => (
-            <View key={index} style={styles.userItem}>
-              <Text style={styles.userName}>{userNames[uuid] || uuid}</Text>
-            </View>
-          ))
+        {data?.matchingUsers?.length > 0 && Object.keys(userNames).length > 0 ? (
+          data.matchingUsers
+            .filter((uuid) => userNames[uuid]) // Only include users with valid names
+            .slice(0, 5) // Limit to maximum 5 users
+            .map((uuid, index) => (
+              <View key={index} style={styles.userItem}>
+                <Text style={styles.userName}>{userNames[uuid]}</Text>
+              </View>
+            ))
         ) : (
           <Text style={styles.noDataText}>No matching travelers found.</Text>
         )}
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 16,
     marginBottom: 30,
     paddingHorizontal: 10,
   },

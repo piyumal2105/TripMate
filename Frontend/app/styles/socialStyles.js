@@ -47,6 +47,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: '#333',
+    marginLeft: -40,
   },
   postText: {
     fontSize: 16,
@@ -170,6 +171,12 @@ export const styles = StyleSheet.create({
     borderColor: '#0478A7', // Selected border color
     backgroundColor: '#e6f3f7', // Light blue background for selected
   },
+  postTime: {
+  fontSize: 12,
+  color: '#888',
+  marginTop: 2,
+  marginLeft: -35,
+},
   categoryText: {
     fontSize: 12,
     color: '#333',
