@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors } from "./../../../constants/Colors";
 import { useNavigation, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./../../../configs/FirebaseConfig";
-import { useState } from "react";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from "./../../../configs/FirebaseConfig"; // Ensure db is imported
+import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 
 export default function SignUp() {
   const navigation = useNavigation();
@@ -20,7 +20,7 @@ export default function SignUp() {
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [fullName, setFulName] = useState();
+  const [fullName, setFullName] = useState(); // Fixed typo: setFulName → setFullName
 
   useEffect(() => {
     navigation.setOptions({
@@ -28,28 +28,46 @@ export default function SignUp() {
     });
   }, []);
 
-  const OnCreateAccount = () => {
-    if (!email && !password && !fullName) {
+  const OnCreateAccount = async () => {
+    if (!email || !password || !fullName) {
       ToastAndroid.show("Please fill all fields", ToastAndroid.LONG);
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up
-        const user = userCredential.user;
-        console.log(user);
-        router.replace("TravelPreferenceScreens/TravelPreferenceScreen");
-        // router.replace("auth/sign-in");
+    try {
+      // Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("User created:", user);
 
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorMessage, errorCode);
-        // ..
+      // Update Firebase Auth profile with displayName
+      await updateProfile(user, {
+        displayName: fullName,
       });
+      console.log("Display name updated successfully in Firebase Auth");
+
+      // Save fullName to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        fullName: fullName,
+        email: email,
+        uid: user.uid,
+        createdAt: new Date(),
+      });
+      console.log("User data saved to Firestore");
+
+      // Navigate to next screen
+      router.replace("TravelPreferenceScreens/TravelPreferenceScreen");
+    } catch (error) {
+      console.error("Signup error:", error);
+      ToastAndroid.show(
+        "Error signing up. Please try again.",
+        ToastAndroid.LONG
+      );
+    }
   };
 
   return (
@@ -64,47 +82,19 @@ export default function SignUp() {
       <TouchableOpacity onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
-      <Text
-        style={{
-          // fontFamily: "outfit-bold",
-          fontSize: 35,
-          marginTop: 30,
-        }}
-      >
-        Create New Account
-      </Text>
+      <Text style={{ fontSize: 35, marginTop: 30 }}>Create New Account</Text>
 
-      <View
-        style={{
-          marginTop: 50,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Full Name
-        </Text>
+      <View style={{ marginTop: 50 }}>
+        <Text>Full Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Full Name"
-          onChangeText={(value) => setFulName(value)}
+          onChangeText={(value) => setFullName(value)} // Fixed typo
         />
       </View>
 
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Email
-        </Text>
+      <View style={{ marginTop: 20 }}>
+        <Text>Email</Text>
         <TextInput
           style={styles.input}
           onChangeText={(value) => setEmail(value)}
@@ -112,18 +102,8 @@ export default function SignUp() {
         />
       </View>
 
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit",
-          }}
-        >
-          Password
-        </Text>
+      <View style={{ marginTop: 20 }}>
+        <Text>Password</Text>
         <TextInput
           secureTextEntry={true}
           style={styles.input}
@@ -132,7 +112,6 @@ export default function SignUp() {
         />
       </View>
 
-      {/* Sign in button */}
       <TouchableOpacity
         onPress={OnCreateAccount}
         style={{
@@ -142,12 +121,7 @@ export default function SignUp() {
           marginTop: 50,
         }}
       >
-        <Text
-          style={{
-            color: Colors.WHITE,
-            textAlign: "center",
-          }}
-        >
+        <Text style={{ color: Colors.WHITE, textAlign: "center" }}>
           Create Account
         </Text>
       </TouchableOpacity>
@@ -162,12 +136,7 @@ export default function SignUp() {
           borderWidth: 1,
         }}
       >
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-            textAlign: "center",
-          }}
-        >
+        <Text style={{ color: Colors.PRIMARY, textAlign: "center" }}>
           Sign In
         </Text>
       </TouchableOpacity>
@@ -181,6 +150,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.GRAY,
     borderRadius: 15,
-    fontFamily: "outfit",
   },
 });

@@ -9,6 +9,7 @@ import {
   Platform,
   Dimensions,
   Linking,
+  Modal,
 } from "react-native";
 import axios from "axios";
 import { auth } from "../../configs/FirebaseConfig.js";
@@ -28,6 +29,188 @@ const SRI_LANKA_CENTER = {
   longitude: 80.7718,
   latitudeDelta: 4.5,
   longitudeDelta: 4.5,
+};
+
+// 360° Street View Component
+const StreetView360Modal = ({ place, visible, onClose }) => {
+  const [loading, setLoading] = useState(true);
+  const [streetViewAvailable, setStreetViewAvailable] = useState(false);
+  const streetViewRef = useRef(null);
+
+  useEffect(() => {
+    if (visible && place && Platform.OS === "web") {
+      loadStreetView();
+    }
+  }, [visible, place]);
+
+  const loadStreetView = () => {
+    if (!place.latitude || !place.longitude) {
+      setStreetViewAvailable(false);
+      setLoading(false);
+      return;
+    }
+
+    const lat = parseFloat(place.latitude);
+    const lng = parseFloat(place.longitude);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      setStreetViewAvailable(false);
+      setLoading(false);
+      return;
+    }
+
+    const createStreetViewIframe = () => {
+      const iframe = document.createElement("iframe");
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.style.borderRadius = "10px";
+
+      // Google Street View embed URL (works without API key for basic embedding)
+      const streetViewUrl = `https://maps.google.com/maps?q=${lat},${lng}&layer=c&cbll=${lat},${lng}&cbp=11,0,0,0,0&output=svembed`;
+
+      iframe.src = streetViewUrl;
+      iframe.title = `360° View of ${place.name}`;
+
+      iframe.onload = () => {
+        setLoading(false);
+        setStreetViewAvailable(true);
+      };
+
+      iframe.onerror = () => {
+        setLoading(false);
+        setStreetViewAvailable(false);
+      };
+
+      if (streetViewRef.current) {
+        streetViewRef.current.innerHTML = "";
+        streetViewRef.current.appendChild(iframe);
+      }
+    };
+
+    createStreetViewIframe();
+  };
+
+  const openExternalStreetView = () => {
+    const lat = parseFloat(place.latitude);
+    const lng = parseFloat(place.longitude);
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      const url = `https://www.google.com/maps/@${lat},${lng},3a,75y,0h,90t/data=!3m6!1e1!3m4!1s0x0:0x0!2e0!7i13312!8i6656`;
+
+      if (Platform.OS === "web") {
+        window.open(url, "_blank");
+      } else {
+        Linking.openURL(url).catch((err) =>
+          console.error("Failed to open Street View:", err)
+        );
+      }
+    }
+  };
+
+  const WebStreetView = () => (
+    <div style={{ width: "100%", height: "400px", position: "relative" }}>
+      {loading && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1000,
+            textAlign: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="#0478A7" />
+          <Text style={{ textAlign: "center", marginTop: 10, color: "#666" }}>
+            Loading 360° View...
+          </Text>
+        </div>
+      )}
+      <div ref={streetViewRef} style={{ width: "100%", height: "100%" }}></div>
+      {!loading && !streetViewAvailable && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            backgroundColor: "rgba(255,255,255,0.95)",
+            padding: "20px",
+            borderRadius: "10px",
+            border: "1px solid #ddd",
+          }}
+        >
+          <Text style={{ fontSize: 16, color: "#666", marginBottom: 10 }}>
+            360° Street View not available for this exact location
+          </Text>
+          <TouchableOpacity
+            style={styles.externalButton}
+            onPress={openExternalStreetView}
+          >
+            <Text style={styles.externalButtonText}>Open in Google Maps</Text>
+          </TouchableOpacity>
+        </div>
+      )}
+    </div>
+  );
+
+  const MobileStreetView = () => (
+    <View style={styles.mobileContainer}>
+      <Text style={styles.mobileText}>
+        🌐 360° View is best experienced on web browsers
+      </Text>
+      <Text style={styles.mobileSubText}>
+        Tap below to open in Google Maps for full 360° experience
+      </Text>
+      <TouchableOpacity
+        style={styles.externalButton}
+        onPress={openExternalStreetView}
+      >
+        <Text style={styles.externalButtonText}>
+          Open Street View in Google Maps
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="formSheet"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>🌍 360° View - {place?.name}</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.streetViewContainer}>
+          {Platform.OS === "web" ? <WebStreetView /> : <MobileStreetView />}
+        </View>
+
+        <View style={styles.modalFooter}>
+          <Text style={styles.footerText}>
+            📍 {place?.location}, {place?.province} Province
+          </Text>
+          <Text style={styles.footerDescription}>{place?.description}</Text>
+          <TouchableOpacity
+            style={styles.fullScreenButton}
+            onPress={openExternalStreetView}
+          >
+            <Text style={styles.fullScreenButtonText}>
+              🔍 Open in Full Screen
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 };
 
 const WebMap = ({ places, selectedPlace, onSelectPlace }) => {
@@ -110,7 +293,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
   if (Platform.OS === "web") return null;
 
   const mapRef = useRef(null);
-  // Create a ref to store marker references
   const markerRefs = useRef({});
 
   useEffect(() => {
@@ -151,7 +333,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           mapRef.current.animateToRegion(newRegion, 1000);
         }
 
-        // Show the callout for the selected place
         const selectedIndex = places.findIndex(
           (place) => place.name === selectedPlace.name
         );
@@ -177,7 +358,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         );
       }
     } else if (places.length > 0) {
-      // If no place is selected, show the callout for the first place by default
       mapRef.current.fitToCoordinates(
         [
           {
@@ -194,7 +374,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           animated: true,
         }
       );
-      // Show callout for the first marker
       if (markerRefs.current[0]) {
         markerRefs.current[0].showCallout();
       }
@@ -226,7 +405,7 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
               return (
                 <Marker
                   key={index}
-                  ref={(ref) => (markerRefs.current[index] = ref)} // Store marker ref
+                  ref={(ref) => (markerRefs.current[index] = ref)}
                   coordinate={{
                     latitude: lat,
                     longitude: lng,
@@ -236,7 +415,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
                   pinColor={selectedPlace === place ? "#0478A7" : "#FF0000"}
                   onPress={() => {
                     onSelectPlace(place);
-                    // Show callout when marker is pressed
                     if (markerRefs.current[index]) {
                       markerRefs.current[index].showCallout();
                     }
@@ -258,6 +436,11 @@ export default function Maps() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
+
+  // New state for 360° view
+  const [streetView360Visible, setStreetView360Visible] = useState(false);
+  const [selectedPlaceFor360, setSelectedPlaceFor360] = useState(null);
+
   const scrollViewRef = useRef(null);
   const mapContainerRef = useRef(null);
 
@@ -379,6 +562,17 @@ export default function Maps() {
     }
   };
 
+  // New function to handle 360° view
+  const handle360ViewOpen = (place) => {
+    setSelectedPlaceFor360(place);
+    setStreetView360Visible(true);
+  };
+
+  const handle360ViewClose = () => {
+    setStreetView360Visible(false);
+    setSelectedPlaceFor360(null);
+  };
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -410,6 +604,7 @@ export default function Maps() {
           <Text>No travel categories selected.</Text>
         )}
       </View>
+
       <Text style={styles.header}>Explore Sri Lanka</Text>
       <View
         ref={Platform.OS === "web" ? mapContainerRef : null}
@@ -444,6 +639,13 @@ export default function Maps() {
             >
               <View style={styles.placeItemHeader}>
                 <Text style={styles.placeTitle}>{place.name}</Text>
+                {/* New 360° View Button */}
+                <TouchableOpacity
+                  style={styles.view360Button}
+                  onPress={() => handle360ViewOpen(place)}
+                >
+                  <Text style={styles.view360ButtonText}>🌍 360°</Text>
+                </TouchableOpacity>
               </View>
               <Text style={styles.placeDetails}>
                 📍 Location: {place.location || "N/A"}
@@ -463,6 +665,13 @@ export default function Maps() {
           <Text>No recommendations available.</Text>
         )}
       </View>
+
+      {/* 360° Street View Modal */}
+      <StreetView360Modal
+        place={selectedPlaceFor360}
+        visible={streetView360Visible}
+        onClose={handle360ViewClose}
+      />
     </ScrollView>
   );
 }
@@ -539,6 +748,8 @@ const styles = StyleSheet.create({
   placeItemHeader: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
   },
   selectedPlaceItem: {
     borderWidth: 2,
@@ -548,8 +759,8 @@ const styles = StyleSheet.create({
   placeTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 4,
     flex: 1,
+    marginRight: 10,
   },
   placeDetails: {
     fontSize: 14,
@@ -560,6 +771,120 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     marginTop: 6,
+  },
+  // New styles for 360° feature
+  view360Button: {
+    backgroundColor: "#0478A7",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+  },
+  view360ButtonText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    backgroundColor: "#f8f9fa",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    flex: 1,
+    color: "#333",
+  },
+  closeButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "#f1f3f4",
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: "#666",
+    fontWeight: "bold",
+  },
+  streetViewContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  modalFooter: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    backgroundColor: "#f8f9fa",
+  },
+  footerText: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
+    fontWeight: "500",
+  },
+  footerDescription: {
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 10,
+    lineHeight: 20,
+  },
+  externalButton: {
+    backgroundColor: "#0478A7",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 5,
+  },
+  externalButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  fullScreenButton: {
+    backgroundColor: "#28a745",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  fullScreenButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  mobileContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f8f9fa",
+  },
+  mobileText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 10,
+    fontWeight: "500",
+  },
+  mobileSubText: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 20,
   },
   errorText: {
     color: "red",
