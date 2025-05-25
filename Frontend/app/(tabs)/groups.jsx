@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { auth } from '../../configs/FirebaseConfig';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 
 const db = getFirestore();
@@ -11,37 +11,49 @@ export default function Groups() {
   const [loading, setLoading] = useState(false);
   const [userNames, setUserNames] = useState({});
   const [showContent, setShowContent] = useState(false);
-  const [hasGroupPreference, setHasGroupPreference] = useState(null); // New state to track "Group" preference
+  const [hasGroupPreference, setHasGroupPreference] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [sentRequests, setSentRequests] = useState(new Set());
+  const [friends, setFriends] = useState(new Set());
 
-  // Function to fetch recommendations
   const fetchRecommendations = async (userId) => {
     setLoading(true);
     try {
+      console.log('Fetching recommendations for userId:', userId);
       const response = await fetch(`http://localhost:8000/recommend/?uuid=${userId}`);
       const result = await response.json();
-      console.log('API Response:', result);
+      console.log('Full API Response:', JSON.stringify(result, null, 2));
       setData(result);
 
       if (result.matchingUsers && result.matchingUsers.length > 0) {
+        console.log('Matching Users found:', result.matchingUsers);
         const namePromises = result.matchingUsers.map(async (uuid) => {
-          const userDoc = await getDoc(doc(db, "users", uuid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            return { uuid, name: userData.fullName || "Unknown User" };
+          let userDoc, userData;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            userDoc = await getDoc(doc(db, "users", uuid));
+            if (userDoc.exists()) break;
+            console.log(`Retry attempt ${attempt + 1} for user ${uuid} failed, waiting...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-          return { uuid, name: "Unknown User" };
+          if (userDoc.exists()) {
+            userData = userDoc.data();
+            console.log(`User ${uuid} name:`, userData.fullName || "Unknown User");
+            return { uuid, name: userData.fullName || "Unknown User" };
+          } else {
+            console.log(`User ${uuid} not found in Firestore after retries`);
+            return { uuid, name: "Unknown User (Not Found)" };
+          }
         });
 
         const resolvedNames = await Promise.all(namePromises);
         const nameMap = resolvedNames.reduce((acc, { uuid, name }) => {
-          if (name !== "Unknown User") {
-            acc[uuid] = name;
-          }
+          acc[uuid] = name;
           return acc;
         }, {});
+        console.log('User Names Map:', nameMap);
         setUserNames(nameMap);
       } else {
+        console.log('No matching users in API response');
         setUserNames({});
       }
     } catch (error) {
@@ -53,7 +65,6 @@ export default function Groups() {
     }
   };
 
-  // Function to check if user has "Group" preference
   const checkGroupPreference = async (userId) => {
     try {
       const preferencesDoc = await getDoc(doc(db, "userPreferences", userId));
@@ -62,38 +73,76 @@ export default function Groups() {
         const travelPreferences = prefs.travelPreferences || [];
         setHasGroupPreference(travelPreferences.includes("Group"));
       } else {
-        setHasGroupPreference(false); // No preferences found, assume "Group" is not selected
+        setHasGroupPreference(false);
       }
     } catch (error) {
       console.error("Error checking group preference:", error);
-      setHasGroupPreference(false); // On error, assume "Group" is not selected
+      setHasGroupPreference(false);
+    }
+  };
+
+  const checkSentRequests = (userId) => {
+    try {
+      const requestsRef = collection(db, 'friendRequests');
+      const q = query(requestsRef, where('fromUserId', '==', userId), where('status', '==', 'pending'));
+      return onSnapshot(q, (snapshot) => {
+        const requestIds = new Set(snapshot.docs.map(doc => doc.data().toUserId));
+        setSentRequests(requestIds);
+      }, (error) => {
+        console.error('Error listening to sent requests:', error);
+      });
+    } catch (error) {
+      console.error('Error checking sent requests:', error);
+      return () => {}; // Return empty cleanup function on error
     }
   };
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    let unsubscribeFriends = () => {};
+    let unsubscribeRequests = () => {};
+    let unsubscribeAuth = () => {};
+
+    unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+      // Clean up previous listeners before setting new ones
+      unsubscribeFriends();
+      unsubscribeRequests();
+
       if (user) {
         const userId = user.uid;
         setCurrentUserId(userId);
-        console.log("User is signed in:", userId);
+        console.log('User signed in:', userId);
         if (showContent) {
-          // Only fetch recommendations if "Group" preference is confirmed
           if (hasGroupPreference) {
             fetchRecommendations(userId);
           }
         } else {
-          // When the component mounts or user changes, check the preference
           await checkGroupPreference(userId);
         }
+        const friendsRef = collection(db, 'friends', userId, 'friendList');
+        unsubscribeFriends = onSnapshot(friendsRef, (snapshot) => {
+          const friendIds = new Set(snapshot.docs.map(doc => doc.data().friendId));
+          setFriends(friendIds);
+        }, (error) => {
+          console.error('Error listening to friends:', error);
+        });
+        unsubscribeRequests = checkSentRequests(userId);
       } else {
         console.log('User is not logged in');
         setData({ error: 'User not logged in' });
         setLoading(false);
         setHasGroupPreference(null);
+        setFriends(new Set());
+        setSentRequests(new Set());
+        setUserNames({});
+        setCurrentUserId(null);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      unsubscribeFriends();
+      unsubscribeRequests();
+    };
   }, [showContent, hasGroupPreference]);
 
   const handleSmartConnectClick = () => {
@@ -102,7 +151,7 @@ export default function Groups() {
 
   const handleRediscoverClick = () => {
     if (currentUserId) {
-      fetchRecommendations(currentUserId); // Re-run the API call
+      fetchRecommendations(currentUserId);
     } else {
       console.log('No user logged in for rediscovery');
       setData({ error: 'User not logged in' });
@@ -110,13 +159,52 @@ export default function Groups() {
   };
 
   const handleGoToProfile = () => {
-    // Navigate to UserProfileScreen
-    // Assuming the route is "/UserProfileScreen" based on your app structure
-    // Adjust the path if needed
     window.location.href = "/UserProfileScreen/UserProfileScreen";
   };
 
-  // Intro screen
+  const sendFriendRequest = async (toUserId) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser || !toUserId) {
+      Alert.alert('Error', 'You must be logged in to send a friend request');
+      return;
+    }
+
+    if (toUserId === currentUser.uid) {
+      Alert.alert('Error', 'You cannot send a friend request to yourself');
+      return;
+    }
+
+    if (friends.has(toUserId)) {
+      Alert.alert('Info', 'This user is already your friend');
+      return;
+    }
+
+    try {
+      const sentRequestsQuery = await getDocs(query(
+        collection(db, 'friendRequests'),
+        where('fromUserId', '==', currentUser.uid),
+        where('toUserId', '==', toUserId),
+        where('status', '==', 'pending')
+      ));
+      if (!sentRequestsQuery.empty) {
+        Alert.alert('Info', 'You have already sent a friend request to this user');
+        return;
+      }
+
+      const requestData = {
+        fromUserId: currentUser.uid,
+        toUserId,
+        status: 'pending',
+        createdAt: new Date(),
+      };
+      await addDoc(collection(db, 'friendRequests'), requestData);
+      Alert.alert('Success', 'Friend request sent!');
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      Alert.alert('Error', 'Failed to send friend request. Please try again.');
+    }
+  };
+
   if (!showContent) {
     return (
       <View style={styles.introContainer}>
@@ -132,7 +220,6 @@ export default function Groups() {
     );
   }
 
-  // Loading state
   if (loading || hasGroupPreference === null) {
     return (
       <View style={styles.loadingContainer}>
@@ -142,7 +229,6 @@ export default function Groups() {
     );
   }
 
-  // Check if "Group" preference is selected
   if (!hasGroupPreference) {
     return (
       <View style={styles.noGroupContainer}>
@@ -157,22 +243,39 @@ export default function Groups() {
     );
   }
 
-  // Main content if "Group" preference is selected
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.sectionTitle}>Suggested Travellers for You</Text>
       <View style={styles.card}>
         {data?.matchingUsers?.length > 0 && Object.keys(userNames).length > 0 ? (
           data.matchingUsers
-            .filter((uuid) => userNames[uuid]) // Only include users with valid names
-            .slice(0, 5) // Limit to maximum 5 users
+            .filter((uuid) => userNames[uuid])
+            .slice(0, 5)
             .map((uuid, index) => (
               <View key={index} style={styles.userItem}>
                 <Text style={styles.userName}>{userNames[uuid]}</Text>
+                <TouchableOpacity
+                  style={styles.addFriendButton}
+                  onPress={() => sendFriendRequest(uuid)}
+                  disabled={friends.has(uuid) || sentRequests.has(uuid)}
+                >
+                  <Ionicons
+                    name={friends.has(uuid) ? "people" : sentRequests.has(uuid) ? "checkmark" : "person-add-outline"}
+                    size={18}
+                    color={friends.has(uuid) ? "#28a745" : sentRequests.has(uuid) ? "#28a745" : "#0478A7"}
+                  />
+                  <Text style={styles.addFriendButtonText}>
+                    {friends.has(uuid) ? "Friends" : sentRequests.has(uuid) ? "Requested" : "Add Friend"}
+                  </Text>
+                </TouchableOpacity>
               </View>
             ))
         ) : (
-          <Text style={styles.noDataText}>No matching travelers found.</Text>
+          <Text style={styles.noDataText}>
+            {data?.matchingUsers?.length === 0
+              ? "No matching travelers found. Try updating your preferences to find better matches!"
+              : "Some traveler names are unavailable (e.g., 'Unknown User'). This may be due to missing data. Try refreshing or contact support if the issue persists."}
+          </Text>
         )}
       </View>
 
@@ -191,7 +294,6 @@ export default function Groups() {
         )}
       </View>
 
-      {/* Re-Discover Button */}
       <TouchableOpacity style={styles.rediscoverButton} onPress={handleRediscoverClick}>
         <Ionicons name="refresh-outline" size={24} color="#fff" style={styles.buttonIcon} />
         <Text style={styles.rediscoverButtonText}>Discover Again</Text>
@@ -201,7 +303,6 @@ export default function Groups() {
 }
 
 const styles = StyleSheet.create({
-  // Intro Section Styles
   introContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -247,8 +348,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
-
-  // No Group Preference Styles
   noGroupContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -283,8 +382,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
-
-  // Existing Styles
   container: {
     flex: 1,
     backgroundColor: '#f5f7fa',
@@ -329,11 +426,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6f3f7',
     borderRadius: 8,
     marginVertical: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   userName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#0478A7',
+  },
+  addFriendButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0f7fa',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#0478A7',
+  },
+  addFriendButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0478A7',
+    marginLeft: 5,
   },
   placeCard: {
     padding: 15,
