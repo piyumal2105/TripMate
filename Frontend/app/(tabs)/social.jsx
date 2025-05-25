@@ -8,8 +8,8 @@ import { IconButton } from 'react-native-paper';
 import { db, auth } from '../../configs/FirebaseConfig';
 import { supabase } from '../../configs/SupabaseConfig';
 import { styles } from '../styles/socialStyles';
-import AddFriend from '../../components/SocialFriends/addfriend';
-import Chat from '../../components/SocialFriends/Chats';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useRouter } from 'expo-router'; // Import useRouter
 
 const formatTimeSince = (createdAt) => {
   if (!createdAt) return 'Just now';
@@ -38,6 +38,7 @@ const formatTimeSince = (createdAt) => {
 const screenWidth = Dimensions.get('window').width;
 
 const PostFeed = () => {
+  const router = useRouter(); // Use Expo Router's router
   const [postText, setPostText] = useState('');
   const [mediaUri, setMediaUri] = useState(null);
   const [mediaType, setMediaType] = useState(null);
@@ -46,27 +47,51 @@ const PostFeed = () => {
   const [editingPost, setEditingPost] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [userPreferences, setUserPreferences] = useState([]);
-  const [addFriendModalVisible, setAddFriendModalVisible] = useState(false);
-  const [chatModalVisible, setChatModalVisible] = useState(false);
   const [friends, setFriends] = useState([]);
+  const [sentRequests, setSentRequests] = useState(new Set());
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   useEffect(() => {
-    const fetchFriends = async () => {
+    const fetchFriendsAndUnreadMessages = async () => {
       const currentUser = auth.currentUser;
       if (!currentUser) return;
 
+      // Fetch friends and unread messages
       const friendsRef = collection(db, 'friends', currentUser.uid, 'friendList');
-      const unsubscribe = onSnapshot(friendsRef, (snapshot) => {
+      const unsubscribeFriends = onSnapshot(friendsRef, async (snapshot) => {
         const friendList = snapshot.docs.map(doc => doc.data().friendId);
         setFriends(friendList);
+
+        // Calculate total unread message count
+        let totalUnread = 0;
+        for (const friendId of friendList) {
+          const chatId = [currentUser.uid, friendId].sort().join('_');
+          const messagesRef = collection(db, 'chats', chatId, 'messages');
+          const lastSeenRef = doc(db, 'lastSeen', `${currentUser.uid}_${friendId}`);
+          
+          let lastSeenTimestamp = null;
+          const lastSeenDoc = await getDoc(lastSeenRef);
+          if (lastSeenDoc.exists()) {
+            lastSeenTimestamp = lastSeenDoc.data().timestamp?.toDate();
+          }
+
+          const q = query(
+            messagesRef,
+            where('senderId', '==', friendId),
+            where('createdAt', '>', lastSeenTimestamp || new Date(0))
+          );
+          const messagesSnapshot = await getDocs(q);
+          totalUnread += messagesSnapshot.docs.length;
+        }
+        setUnreadMessageCount(totalUnread);
       }, (error) => {
         console.error('Error fetching friends:', error.message);
       });
 
-      return () => unsubscribe();
+      return () => unsubscribeFriends();
     };
 
-    fetchFriends();
+    fetchFriendsAndUnreadMessages();
 
     const unsubscribePosts = onSnapshot(collection(db, 'posts'), async (snapshot) => {
       const fetchedPosts = snapshot.docs.map((doc) => ({
@@ -74,7 +99,6 @@ const PostFeed = () => {
         ...doc.data(),
       }));
 
-      // Fetch fullName for each post's userId
       const postsWithNames = [];
       for (const post of fetchedPosts) {
         const userRef = doc(db, 'users', post.userId);
@@ -103,10 +127,7 @@ const PostFeed = () => {
             "Adventure Sports": "Adventure"
           };
 
-          // Map user preferences to their categories
           const userMappedPrefs = userPreferences.map(pref => preferenceToPostMap[pref] || pref);
-
-          // Count matches only for user's selected preferences
           const aMatches = a.categories?.filter(category => userMappedPrefs.includes(category))?.length || 0;
           const bMatches = b.categories?.filter(category => userMappedPrefs.includes(category))?.length || 0;
 
@@ -114,10 +135,9 @@ const PostFeed = () => {
           console.log(`Post ${b.id} matches: ${bMatches}, Categories: ${b.categories}, User Mapped Prefs: ${userMappedPrefs}`);
 
           if (aMatches !== bMatches) {
-            return bMatches - aMatches; // Higher matches come first
+            return bMatches - aMatches;
           }
 
-          // If no matches or equal matches, sort by date (newest first)
           const aDate = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
           const bDate = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
           return bDate - aDate;
@@ -458,7 +478,7 @@ const PostFeed = () => {
     }
 
     try {
-      const sentRequests = await getDocs(query(
+      const sentRequestsQuery = await getDocs(query(
         collection(db, 'friendRequests'),
         where('fromUserId', '==', currentUser.uid),
         where('toUserId', '==', toUserId),
@@ -471,7 +491,7 @@ const PostFeed = () => {
         where('status', '==', 'pending')
       ));
 
-      if (!sentRequests.empty) {
+      if (!sentRequestsQuery.empty) {
         alert('You have already sent a friend request to this user');
         return;
       }
@@ -489,6 +509,7 @@ const PostFeed = () => {
       console.log('Sending friend request with data:', requestData);
 
       await addDoc(collection(db, 'friendRequests'), requestData);
+      setSentRequests(new Set(sentRequests).add(toUserId));
 
       alert('Friend request sent!');
     } catch (error) {
@@ -510,18 +531,44 @@ const PostFeed = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Social Feed</Text>
-        <View style={styles.headerButtons}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => setAddFriendModalVisible(true)}
+            style={{
+              backgroundColor: '#f0f0f0',
+              borderRadius: 20,
+              padding: 5,
+              marginRight: 10,
+              position: 'relative',
+            }}
+            onPress={() => router.push('ChatScreen/ChatScreen')}
           >
-            <Text style={styles.headerButtonText}>Add Friend</Text>
+            <Ionicons name="chatbubble-outline" size={28} color="#000" />
+            {unreadMessageCount > 0 && (
+              <View style={{
+                backgroundColor: '#0095f6',
+                borderRadius: 10,
+                padding: 2,
+                minWidth: 18,
+                height: 18,
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'absolute',
+                top: -5,
+                right: -5,
+              }}>
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>{unreadMessageCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => setChatModalVisible(true)}
+            style={{
+              backgroundColor: '#f0f0f0',
+              borderRadius: 20,
+              padding: 5,
+            }}
+            onPress={() => router.push('UserProfileScreen/UserProfileScreen')}
           >
-            <Text style={styles.headerButtonText}>Chat</Text>
+            <Ionicons name="person-outline" size={28} color="#000" />
           </TouchableOpacity>
         </View>
       </View>
@@ -553,16 +600,22 @@ const PostFeed = () => {
                 <View style={styles.postHeaderInfo}>
                   <View style={styles.postHeaderRow}>
                     <Text style={styles.username}>{item.fullName}</Text>
-                    {item.userId !== auth.currentUser?.uid && !friends.includes(item.userId) && (
+                    {item.userId !== auth.currentUser?.uid && !friends.includes(item.userId) && !sentRequests.has(item.userId) && (
                       <TouchableOpacity
-                        style={styles.addFriendButton}
                         onPress={() => sendFriendRequest(item.userId)}
                       >
-                        <Text style={styles.addFriendButtonText}>Add Friend</Text>
+                        <Ionicons name="person-add-outline" size={18} color="#0095f6" style={{ marginLeft: 8 }} />
                       </TouchableOpacity>
                     )}
+                    {item.userId !== auth.currentUser?.uid && !friends.includes(item.userId) && sentRequests.has(item.userId) && (
+                      <Text style={{ color: '#0095f6', fontSize: 14, marginLeft: 8 }}>
+                        Requested
+                      </Text>
+                    )}
                     {item.userId !== auth.currentUser?.uid && friends.includes(item.userId) && (
-                      <Text style={styles.addFriendButtonText}>Friends</Text>
+                      <Text style={{ color: '#0095f6', fontSize: 14, marginLeft: 8 }}>
+                        Friends
+                      </Text>
                     )}
                   </View>
                   <Text style={styles.postTime}>{formatTimeSince(item.createdAt)}</Text>
@@ -711,34 +764,6 @@ const PostFeed = () => {
                 <Text style={styles.addPostButton}>{editingPost ? 'Update' : 'Add Post'}</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal visible={addFriendModalVisible} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setAddFriendModalVisible(false)}
-            >
-              <Text style={styles.cancelButton}>Close</Text>
-            </TouchableOpacity>
-            <AddFriend />
-          </View>
-        </View>
-      </Modal>
-
-      <Modal visible={chatModalVisible} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setChatModalVisible(false)}
-            >
-              <Text style={styles.cancelButton}>Close</Text>
-            </TouchableOpacity>
-            <Chat />
           </View>
         </View>
       </Modal>
