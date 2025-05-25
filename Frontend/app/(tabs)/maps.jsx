@@ -657,7 +657,7 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
   );
 };
 
-// Updated 360° Modal Component with blue theme
+// Updated 360° Modal Component
 const InApp360Modal = ({ place, visible, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [currentViewType, setCurrentViewType] = useState("360cities");
@@ -847,36 +847,78 @@ const InApp360Modal = ({ place, visible, onClose }) => {
   );
 };
 
-// Updated In-App 360Cities Browser Component with blue theme
+// Enhanced In-App 360Cities Browser Component
 const InApp360CitiesBrowser = ({ visible, onClose }) => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [webViewKey, setWebViewKey] = useState(0);
   const webViewRef = useRef(null);
-  const sriLanka360CitiesURL = "https://www.360cities.net/area/sri-lanka";
+  const sriLanka360CitiesURL =
+    "https://www.360cities.net/area/sri-lanka?embed=true";
+
+  const handleRetry = () => {
+    setError(null);
+    setLoading(true);
+    setWebViewKey((prev) => prev + 1); // Force WebView to reload
+  };
 
   const WebBrowserView = () => {
     if (Platform.OS === "web") {
       return (
         <iframe
           src={sriLanka360CitiesURL}
-          style={{ width: "100%", height: "100%", border: "none" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "none",
+            borderRadius: "12px",
+          }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
           onLoad={() => setLoading(false)}
+          onError={() => {
+            setLoading(false);
+            setError("Failed to load 360Cities panorama");
+          }}
         />
       );
     }
 
     return (
       <WebView
+        key={webViewKey}
         ref={webViewRef}
         source={{ uri: sriLanka360CitiesURL }}
         style={styles.browserWebView}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
         javaScriptEnabled={true}
         domStorageEnabled={true}
+        startInLoadingState={true}
+        scalesPageToFit={true}
+        allowsFullscreenVideo={true}
+        allowsInlineMediaPlayback={true}
+        onLoadStart={() => {
+          setLoading(true);
+          setError(null);
+        }}
+        onLoadEnd={() => setLoading(false)}
+        onError={() => {
+          setLoading(false);
+          setError("Failed to load 360Cities panorama");
+        }}
         renderLoading={() => (
           <View style={styles.browserLoading}>
             <ActivityIndicator size="large" color="#0478A7" />
             <Text style={styles.browserLoadingText}>Loading 360Cities...</Text>
+          </View>
+        )}
+        renderError={() => (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
+              {error || "Failed to load 360Cities panorama"}
+            </Text>
+            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
@@ -896,9 +938,22 @@ const InApp360CitiesBrowser = ({ visible, onClose }) => {
             <Text style={styles.browserBackButtonText}>← Back</Text>
           </TouchableOpacity>
           <Text style={styles.browserTitle}>360Cities Sri Lanka</Text>
+          <View style={styles.browserHeaderSpacer} />
         </View>
         <View style={styles.browserContent}>
-          <WebBrowserView />
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={handleRetry}
+              >
+                <Text style={styles.retryButtonText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <WebBrowserView />
+          )}
         </View>
       </View>
     </Modal>
@@ -1403,7 +1458,7 @@ export default function Maps() {
         )}
       </View>
 
-      {/* Enhanced 360Cities Banner with blue theme */}
+      {/* Enhanced 360Cities Banner */}
       <TouchableOpacity
         style={styles.bannerButton}
         onPress={handleBrowser360Open}
@@ -1512,41 +1567,6 @@ export default function Maps() {
 }
 
 const styles = StyleSheet.create({
-  // ... (Previous styles remain the same until the new additions)
-
-  // Updated place description to be justified
-  infoPlaceDescription: {
-    fontSize: 16,
-    color: "#555",
-    lineHeight: 24,
-    textAlign: "justify", // Added text justification
-  },
-
-  // New styles for photos loading
-  photosLoadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 40,
-  },
-
-  photosLoadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-  },
-
-  // Updated search input for better user experience
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-  },
-
-  // ... (All other existing styles remain the same)
   container: {
     flex: 1,
     padding: 16,
@@ -1622,7 +1642,90 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-  // ... (Include all other existing styles)
+  recommendationsContainer: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  placeItem: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
+    overflow: "hidden",
+  },
+  selectedPlaceItem: {
+    borderWidth: 3,
+    borderColor: "#0478A7",
+    backgroundColor: "#f0f9ff",
+  },
+  placeMainContent: {
+    padding: 16,
+    paddingBottom: 12,
+  },
+  placeTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
+    lineHeight: 26,
+  },
+  placeDetails: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 4,
+    lineHeight: 18,
+  },
+  placeDescription: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 8,
+    lineHeight: 20,
+    textAlign: "justify",
+  },
+  placeButtonRow: {
+    flexDirection: "row",
+    backgroundColor: "#f8f9fa",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e9ecef",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  actionButton360: {
+    backgroundColor: "#0478A7",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    flex: 1,
+    marginRight: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  actionButtonInfo: {
+    backgroundColor: "#17a2b8",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    flex: 1,
+    marginLeft: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  actionButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   infoModalContainer: {
     flex: 1,
     backgroundColor: "#fff",
@@ -1721,6 +1824,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: "500",
   },
+  infoPlaceDescription: {
+    fontSize: 16,
+    color: "#555",
+    lineHeight: 24,
+    textAlign: "justify",
+  },
   photosTabContainer: {
     flex: 1,
   },
@@ -1736,6 +1845,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: "#333",
+    paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   clearSearchButton: {
     padding: 4,
@@ -1928,7 +2044,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-  // Additional styles for loading and error states
   infoLoadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -2024,7 +2139,7 @@ const styles = StyleSheet.create({
     color: "#555",
     lineHeight: 22,
     marginBottom: 15,
-    textAlign: "justify", // Added text justification for Wikipedia content
+    textAlign: "justify",
   },
   wikiButton: {
     backgroundColor: "#0478A7",
@@ -2043,92 +2158,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
-  // Additional styles for remaining components
-  recommendationsContainer: {
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  placeItem: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
-    overflow: "hidden",
-  },
-  selectedPlaceItem: {
-    borderWidth: 3,
-    borderColor: "#0478A7",
-    backgroundColor: "#f0f9ff",
-  },
-  placeMainContent: {
-    padding: 16,
-    paddingBottom: 12,
-  },
-  placeTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
-    lineHeight: 26,
-  },
-  placeDetails: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-    lineHeight: 18,
-  },
-  placeDescription: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 8,
-    lineHeight: 20,
-    textAlign: "justify", // Added text justification
-  },
-  placeButtonRow: {
-    flexDirection: "row",
-    backgroundColor: "#f8f9fa",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#e9ecef",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  actionButton360: {
-    backgroundColor: "#0478A7",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
-    flex: 1,
-    marginRight: 8,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
-  },
-  actionButtonInfo: {
-    backgroundColor: "#17a2b8",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
-    flex: 1,
-    marginLeft: 8,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
-  },
-  actionButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  // 360° Modal Styles
   modalContainer: {
     flex: 1,
     backgroundColor: "#fff",
@@ -2246,9 +2275,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     lineHeight: 20,
-    textAlign: "justify", // Added text justification
+    textAlign: "justify",
   },
-  // Browser Modal Styles
   browserModalContainer: {
     flex: 1,
     backgroundColor: "#fff",
@@ -2280,6 +2308,9 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
   },
+  browserHeaderSpacer: {
+    width: 60, // To balance the back button
+  },
   browserContent: {
     flex: 1,
   },
@@ -2300,7 +2331,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  // Map Control Styles
   webMapControls: {
     position: "absolute",
     top: 10,
@@ -2379,15 +2409,6 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     fontSize: 16,
-  },
-  zoomIndicator: {
-    position: "absolute",
-    bottom: 15,
-    left: 15,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
   },
   zoomIndicatorText: {
     color: "white",
