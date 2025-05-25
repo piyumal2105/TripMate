@@ -3,12 +3,13 @@ import { View, Text, Image, TextInput, FlatList, Dimensions, TouchableOpacity, M
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Video } from 'expo-av';
-import { addDoc, updateDoc, doc, deleteDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
+import { addDoc, updateDoc, doc, deleteDoc, arrayUnion, arrayRemove, getDoc, getDocs, collection, query, where, onSnapshot, setDoc } from 'firebase/firestore';
 import { IconButton } from 'react-native-paper';
-import { onSnapshot, collection } from 'firebase/firestore';
 import { db, auth } from '../../configs/FirebaseConfig';
 import { supabase } from '../../configs/SupabaseConfig';
 import { styles } from '../styles/socialStyles';
+import AddFriend from '../../components/SocialFriends/addfriend';
+import Chat from '../../components/SocialFriends/Chats';
 
 const formatTimeSince = (createdAt) => {
   if (!createdAt) return 'Just now';
@@ -45,19 +46,47 @@ const PostFeed = () => {
   const [editingPost, setEditingPost] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [userPreferences, setUserPreferences] = useState([]);
+  const [addFriendModalVisible, setAddFriendModalVisible] = useState(false);
+  const [chatModalVisible, setChatModalVisible] = useState(false);
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
+    const fetchFriends = async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      const friendsRef = collection(db, 'friends', currentUser.uid, 'friendList');
+      const unsubscribe = onSnapshot(friendsRef, (snapshot) => {
+        const friendList = snapshot.docs.map(doc => doc.data().friendId);
+        setFriends(friendList);
+      }, (error) => {
+        console.error('Error fetching friends:', error.message);
+      });
+
+      return () => unsubscribe();
+    };
+
+    fetchFriends();
+
+    const unsubscribePosts = onSnapshot(collection(db, 'posts'), async (snapshot) => {
       const fetchedPosts = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
+      // Fetch fullName for each post's userId
+      const postsWithNames = [];
+      for (const post of fetchedPosts) {
+        const userRef = doc(db, 'users', post.userId);
+        const userDoc = await getDoc(userRef);
+        const fullName = userDoc.exists() ? userDoc.data().fullName || 'Anonymous' : 'Anonymous';
+        postsWithNames.push({ ...post, fullName });
+      }
+
       const user = auth.currentUser;
       if (user && userPreferences.length > 0) {
         console.log("Current User Preferences:", userPreferences);
-        fetchedPosts.sort((a, b) => {
-          // Define mapping from user preferences to post categories
+        postsWithNames.sort((a, b) => {
           const preferenceToPostMap = {
             "Beaches": "Beaches",
             "Colonial Towns": "Culture",
@@ -74,58 +103,72 @@ const PostFeed = () => {
             "Adventure Sports": "Adventure"
           };
 
-          // Calculate matches for post A
-          const aMappedPrefs = userPreferences.map(pref => preferenceToPostMap[pref] || pref);
-          const aMatches = a.categories?.filter(category => aMappedPrefs.includes(category))?.length || 0;
+          // Map user preferences to their categories
+          const userMappedPrefs = userPreferences.map(pref => preferenceToPostMap[pref] || pref);
 
-          // Calculate matches for post B
-          const bMappedPrefs = userPreferences.map(pref => preferenceToPostMap[pref] || pref);
-          const bMatches = b.categories?.filter(category => bMappedPrefs.includes(category))?.length || 0;
+          // Count matches only for user's selected preferences
+          const aMatches = a.categories?.filter(category => userMappedPrefs.includes(category))?.length || 0;
+          const bMatches = b.categories?.filter(category => userMappedPrefs.includes(category))?.length || 0;
 
-          console.log(`Post ${a.id} matches: ${aMatches}, Categories: ${a.categories}, Mapped Prefs: ${aMappedPrefs}`);
-          console.log(`Post ${b.id} matches: ${bMatches}, Categories: ${b.categories}, Mapped Prefs: ${bMappedPrefs}`);
+          console.log(`Post ${a.id} matches: ${aMatches}, Categories: ${a.categories}, User Mapped Prefs: ${userMappedPrefs}`);
+          console.log(`Post ${b.id} matches: ${bMatches}, Categories: ${b.categories}, User Mapped Prefs: ${userMappedPrefs}`);
 
           if (aMatches !== bMatches) {
-            return bMatches - aMatches; // Higher matches first
+            return bMatches - aMatches; // Higher matches come first
           }
 
+          // If no matches or equal matches, sort by date (newest first)
           const aDate = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
           const bDate = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-          return bDate - aDate; // Newer posts first if match counts are equal
+          return bDate - aDate;
         });
       } else {
-        fetchedPosts.sort((a, b) => {
+        postsWithNames.sort((a, b) => {
           const aDate = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
           const bDate = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-          return bDate - aDate; // Default to newest first
+          return bDate - aDate;
         });
       }
 
-      console.log("Sorted Posts Order:", fetchedPosts.map(post => ({
+      console.log("Sorted Posts Order:", postsWithNames.map(post => ({
         id: post.id,
         categories: post.categories,
         createdAt: post.createdAt?.toDate ? post.createdAt.toDate().toISOString() : post.createdAt,
       })));
-      setPosts(fetchedPosts);
+      setPosts(postsWithNames);
     });
 
     const fetchUserPreferences = async () => {
       const user = auth.currentUser;
-      if (user) {
-        const preferencesDoc = await getDoc(doc(db, 'userPreferences', user.uid));
+      console.log('Fetching preferences for user:', user ? user.uid : 'Not authenticated');
+      if (!user) {
+        console.log('No authenticated user, skipping preferences fetch');
+        setUserPreferences([]);
+        return;
+      }
+
+      try {
+        const preferencesRef = doc(db, 'preferences', user.uid);
+        const preferencesDoc = await getDoc(preferencesRef);
         if (preferencesDoc.exists()) {
           const prefs = preferencesDoc.data();
           console.log("Fetched Preferences from Firestore:", prefs);
-          setUserPreferences(prefs.travelCategories || []);
+          setUserPreferences(prefs.travelCategories || prefs.categories || []);
         } else {
-          console.log("No preferences document found for user:", user.uid);
+          console.log("No preferences document found, creating default...");
+          await setDoc(preferencesRef, { travelCategories: [], createdAt: new Date() }, { merge: true });
           setUserPreferences([]);
         }
+      } catch (error) {
+        console.error('Error fetching user preferences:', error.message, 'Stack:', error.stack);
+        setUserPreferences([]);
       }
     };
     fetchUserPreferences();
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribePosts();
+    };
   }, [userPreferences]);
 
   const pickMedia = async () => {
@@ -272,8 +315,9 @@ const PostFeed = () => {
         alert('You must be logged in to post');
         return;
       }
-      const username = user.displayName || 'Anonymous';
-      console.log('Username:', username);
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const fullName = userDoc.exists() ? userDoc.data().fullName || 'Anonymous' : 'Anonymous';
+      console.log('Full Name:', fullName);
       let downloadURL = null;
 
       if (mediaUri) {
@@ -288,7 +332,7 @@ const PostFeed = () => {
         text: postText,
         mediaUri: downloadURL || null,
         mediaType: mediaType || null,
-        username,
+        fullName,
         categories: selectedCategories,
         userId: user.uid,
         createdAt: new Date(),
@@ -302,7 +346,7 @@ const PostFeed = () => {
           text: postText,
           mediaUri: downloadURL || null,
           mediaType: mediaType || null,
-          username,
+          fullName,
           categories: selectedCategories,
         });
         console.log('Post updated successfully');
@@ -316,7 +360,7 @@ const PostFeed = () => {
           createdAt: new Date(),
           likes: 0,
           likedBy: [],
-          username,
+          fullName,
           userId: user.uid,
           categories: selectedCategories,
         });
@@ -395,6 +439,64 @@ const PostFeed = () => {
     }
   };
 
+  const sendFriendRequest = async (toUserId) => {
+    const currentUser = auth.currentUser;
+    console.log('Current User:', currentUser ? currentUser.uid : 'Not authenticated');
+    if (!currentUser) {
+      alert('You must be logged in to send a friend request');
+      return;
+    }
+
+    if (toUserId === currentUser.uid) {
+      alert('You cannot send a friend request to yourself');
+      return;
+    }
+
+    if (friends.includes(toUserId)) {
+      alert('You are already friends with this user');
+      return;
+    }
+
+    try {
+      const sentRequests = await getDocs(query(
+        collection(db, 'friendRequests'),
+        where('fromUserId', '==', currentUser.uid),
+        where('toUserId', '==', toUserId),
+        where('status', '==', 'pending')
+      ));
+      const receivedRequests = await getDocs(query(
+        collection(db, 'friendRequests'),
+        where('toUserId', '==', currentUser.uid),
+        where('fromUserId', '==', toUserId),
+        where('status', '==', 'pending')
+      ));
+
+      if (!sentRequests.empty) {
+        alert('You have already sent a friend request to this user');
+        return;
+      }
+      if (!receivedRequests.empty) {
+        alert('This user has already sent you a friend request. Please accept it.');
+        return;
+      }
+
+      const requestData = {
+        fromUserId: currentUser.uid,
+        toUserId,
+        status: 'pending',
+        createdAt: new Date(),
+      };
+      console.log('Sending friend request with data:', requestData);
+
+      await addDoc(collection(db, 'friendRequests'), requestData);
+
+      alert('Friend request sent!');
+    } catch (error) {
+      console.error('Error sending friend request:', error.message, 'Stack:', error.stack);
+      alert('Failed to send friend request: ' + (error.message || 'Unknown error'));
+    }
+  };
+
   const categories = ['Solo', 'Couple', 'Family', 'Nature', 'Wildlife', 'Mountains', 'Beaches', 'Adventure', 'Culture', 'Temples'];
   const toggleCategory = (category) => {
     setSelectedCategories((prev) =>
@@ -406,6 +508,24 @@ const PostFeed = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Social Feed</Text>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setAddFriendModalVisible(true)}
+          >
+            <Text style={styles.headerButtonText}>Add Friend</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setChatModalVisible(true)}
+          >
+            <Text style={styles.headerButtonText}>Chat</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <TextInput
           placeholder="What's on your mind?"
@@ -430,8 +550,21 @@ const PostFeed = () => {
                     console.log('Profile picture load error:', item.profilePicture, e.nativeEvent.error);
                   }}
                 />
-                <View>
-                  <Text style={styles.username}>{item.username || 'User'}</Text>
+                <View style={styles.postHeaderInfo}>
+                  <View style={styles.postHeaderRow}>
+                    <Text style={styles.username}>{item.fullName}</Text>
+                    {item.userId !== auth.currentUser?.uid && !friends.includes(item.userId) && (
+                      <TouchableOpacity
+                        style={styles.addFriendButton}
+                        onPress={() => sendFriendRequest(item.userId)}
+                      >
+                        <Text style={styles.addFriendButtonText}>Add Friend</Text>
+                      </TouchableOpacity>
+                    )}
+                    {item.userId !== auth.currentUser?.uid && friends.includes(item.userId) && (
+                      <Text style={styles.addFriendButtonText}>Friends</Text>
+                    )}
+                  </View>
                   <Text style={styles.postTime}>{formatTimeSince(item.createdAt)}</Text>
                 </View>
               </View>
@@ -578,6 +711,34 @@ const PostFeed = () => {
                 <Text style={styles.addPostButton}>{editingPost ? 'Update' : 'Add Post'}</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={addFriendModalVisible} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setAddFriendModalVisible(false)}
+            >
+              <Text style={styles.cancelButton}>Close</Text>
+            </TouchableOpacity>
+            <AddFriend />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={chatModalVisible} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setChatModalVisible(false)}
+            >
+              <Text style={styles.cancelButton}>Close</Text>
+            </TouchableOpacity>
+            <Chat />
           </View>
         </View>
       </Modal>

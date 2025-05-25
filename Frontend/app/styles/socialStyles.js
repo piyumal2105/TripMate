@@ -185,4 +185,55 @@ export const styles = StyleSheet.create({
   categoryTextSelected: {
     color: '#0478A7', // Selected text color
   },
+  header: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: 10,
+  backgroundColor: '#f8f8f8',
+  borderBottomWidth: 1,
+  borderBottomColor: '#ddd',
+},
+headerTitle: {
+  fontSize: 20,
+  fontWeight: 'bold',
+},
+headerButtons: {
+  flexDirection: 'row',
+},
+headerButton: {
+  backgroundColor: '#007BFF',
+  paddingVertical: 5,
+  paddingHorizontal: 10,
+  borderRadius: 5,
+  marginLeft: 10,
+},
+headerButtonText: {
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: 'bold',
+},
+closeButton: {
+  alignSelf: 'flex-end',
+  padding: 10,
+},
+postHeaderInfo: {
+  flex: 1,
+},
+postHeaderRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+},
+addFriendButton: {
+  backgroundColor: '#28A745',
+  paddingVertical: 4,
+  paddingHorizontal: 8,
+  borderRadius: 5,
+},
+addFriendButtonText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: 'bold',
+},
 });
