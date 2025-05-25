@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { auth } from '../../configs/FirebaseConfig';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for icons
+import { Ionicons } from '@expo/vector-icons';
 
 const db = getFirestore();
 
@@ -11,6 +11,8 @@ export default function Groups() {
   const [loading, setLoading] = useState(false);
   const [userNames, setUserNames] = useState({});
   const [showContent, setShowContent] = useState(false);
+  const [hasGroupPreference, setHasGroupPreference] = useState(null); // New state to track "Group" preference
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   // Function to fetch recommendations
   const fetchRecommendations = async (userId) => {
@@ -51,38 +53,70 @@ export default function Groups() {
     }
   };
 
-  useEffect(() => {
-    if (!showContent) return;
+  // Function to check if user has "Group" preference
+  const checkGroupPreference = async (userId) => {
+    try {
+      const preferencesDoc = await getDoc(doc(db, "userPreferences", userId));
+      if (preferencesDoc.exists()) {
+        const prefs = preferencesDoc.data();
+        const travelPreferences = prefs.travelPreferences || [];
+        setHasGroupPreference(travelPreferences.includes("Group"));
+      } else {
+        setHasGroupPreference(false); // No preferences found, assume "Group" is not selected
+      }
+    } catch (error) {
+      console.error("Error checking group preference:", error);
+      setHasGroupPreference(false); // On error, assume "Group" is not selected
+    }
+  };
 
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userId = user.uid;
+        setCurrentUserId(userId);
         console.log("User is signed in:", userId);
-        fetchRecommendations(userId);
+        if (showContent) {
+          // Only fetch recommendations if "Group" preference is confirmed
+          if (hasGroupPreference) {
+            fetchRecommendations(userId);
+          }
+        } else {
+          // When the component mounts or user changes, check the preference
+          await checkGroupPreference(userId);
+        }
       } else {
         console.log('User is not logged in');
         setData({ error: 'User not logged in' });
         setLoading(false);
+        setHasGroupPreference(null);
       }
     });
 
     return () => unsubscribe();
-  }, [showContent]);
+  }, [showContent, hasGroupPreference]);
 
   const handleSmartConnectClick = () => {
     setShowContent(true);
   };
 
   const handleRediscoverClick = () => {
-    const user = auth.currentUser;
-    if (user) {
-      fetchRecommendations(user.uid); // Re-run the API call
+    if (currentUserId) {
+      fetchRecommendations(currentUserId); // Re-run the API call
     } else {
       console.log('No user logged in for rediscovery');
       setData({ error: 'User not logged in' });
     }
   };
 
+  const handleGoToProfile = () => {
+    // Navigate to UserProfileScreen
+    // Assuming the route is "/UserProfileScreen" based on your app structure
+    // Adjust the path if needed
+    window.location.href = "/UserProfileScreen/UserProfileScreen";
+  };
+
+  // Intro screen
   if (!showContent) {
     return (
       <View style={styles.introContainer}>
@@ -98,15 +132,32 @@ export default function Groups() {
     );
   }
 
-  if (loading) {
+  // Loading state
+  if (loading || hasGroupPreference === null) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0478A7" />
-        <Text style={styles.loadingText}>Loading your recommendations...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
 
+  // Check if "Group" preference is selected
+  if (!hasGroupPreference) {
+    return (
+      <View style={styles.noGroupContainer}>
+        <Text style={styles.noGroupText}>
+          You did not select Group as a travel preference. If you want, you can add it.
+        </Text>
+        <TouchableOpacity style={styles.goToProfileButton} onPress={handleGoToProfile}>
+          <Ionicons name="person-outline" size={24} color="#fff" style={styles.buttonIcon} />
+          <Text style={styles.goToProfileButtonText}>Go to Profile</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Main content if "Group" preference is selected
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.sectionTitle}>Suggested Travellers for You</Text>
@@ -197,6 +248,42 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  // No Group Preference Styles
+  noGroupContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f7fa',
+    padding: 20,
+  },
+  noGroupText: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  goToProfileButton: {
+    flexDirection: 'row',
+    backgroundColor: '#0478A7',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  goToProfileButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
+  },
+
   // Existing Styles
   container: {
     flex: 1,
@@ -279,7 +366,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 10,
   },
-  // Re-Discover Button Styles
   rediscoverButton: {
     flexDirection: 'row',
     backgroundColor: '#0478A7',
@@ -293,7 +379,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'center', // Center horizontally
+    alignSelf: 'center',
     marginTop: 20,
   },
   rediscoverButtonText: {

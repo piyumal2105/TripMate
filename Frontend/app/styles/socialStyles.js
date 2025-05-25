@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: '#333',
-    marginLeft: -40,
+    marginLeft: 5,
   },
   postText: {
     fontSize: 16,
@@ -175,7 +175,7 @@ export const styles = StyleSheet.create({
   fontSize: 12,
   color: '#888',
   marginTop: 2,
-  marginLeft: -35,
+  
 },
   categoryText: {
     fontSize: 12,
