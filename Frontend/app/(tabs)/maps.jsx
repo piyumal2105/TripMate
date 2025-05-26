@@ -48,7 +48,6 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
   const [filteredPhotos, setFilteredPhotos] = useState([]);
   const [photosLoading, setPhotosLoading] = useState(false);
 
-  // Debounced search
   const searchTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -57,7 +56,6 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
     }
   }, [visible, place]);
 
-  // Debounced search effect
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -84,7 +82,7 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
       } else {
         setFilteredPhotos(placeInfo?.photos || []);
       }
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => {
       if (searchTimeoutRef.current) {
@@ -176,8 +174,6 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
 
   const fetchWeatherInfo = async () => {
     try {
-      // You can replace this with a real weather API like OpenWeatherMap
-      // For now, using mock data but structured for real API integration
       return {
         temperature: Math.floor(Math.random() * 10) + 25,
         description: ["Sunny", "Partly cloudy", "Cloudy", "Light rain"][
@@ -194,118 +190,16 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
   const fetchPhotosInfo = async () => {
     setPhotosLoading(true);
     try {
-      // Using Unsplash API for dynamic photo fetching
-      const UNSPLASH_ACCESS_KEY = "YOUR_UNSPLASH_ACCESS_KEY"; // Replace with your actual API key
-
-      if (
-        !UNSPLASH_ACCESS_KEY ||
-        UNSPLASH_ACCESS_KEY === "YOUR_UNSPLASH_ACCESS_KEY"
-      ) {
-        // Fallback to demo mode with fewer, more realistic photos
-        console.log("No Unsplash API key found, using demo photos");
-        return getDemoPhotos();
-      }
-
-      // Search for photos related to the place
-      const searchQueries = [
-        `${place.name} Sri Lanka`,
-        `${place.location} Sri Lanka`,
-        `Sri Lanka ${place.category}`,
-        "Sri Lanka landscape",
-        "Sri Lanka tourism",
-      ];
-
-      const photoPromises = searchQueries.map(async (query) => {
-        try {
-          const response = await axios.get(
-            "https://api.unsplash.com/search/photos",
-            {
-              params: {
-                query: query,
-                per_page: 5,
-                orientation: "landscape",
-                content_filter: "high",
-              },
-              headers: {
-                Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
-              },
-              timeout: 8000,
-            }
-          );
-          return response.data.results || [];
-        } catch (error) {
-          console.log(`Failed to fetch photos for query: ${query}`, error);
-          return [];
-        }
-      });
-
-      const photoResults = await Promise.allSettled(photoPromises);
-      const allPhotos = photoResults
-        .filter((result) => result.status === "fulfilled")
-        .flatMap((result) => result.value)
-        .filter(
-          (photo, index, self) =>
-            // Remove duplicates based on photo ID
-            index === self.findIndex((p) => p.id === photo.id)
-        );
-
-      if (allPhotos.length === 0) {
-        return getDemoPhotos();
-      }
-
-      // Transform Unsplash data to our format
-      return allPhotos.slice(0, 12).map((photo) => ({
-        id: photo.id,
-        url: photo.urls.small,
-        fullUrl: photo.urls.regular,
-        photographer: photo.user.name,
-        description:
-          photo.alt_description ||
-          photo.description ||
-          `Beautiful view of ${place.name}`,
-        category:
-          getCategoryFromTags(photo.tags) || place.category || "Landscape",
-        likes: photo.likes || 0,
-        downloads: photo.downloads || 0,
-        tags: photo.tags || [],
-        user: photo.user,
-        alt_description: photo.alt_description,
-      }));
+      return getDemoPhotos();
     } catch (error) {
-      console.error("Error fetching photos from Unsplash:", error);
+      console.error("Error fetching photos:", error);
       return getDemoPhotos();
     } finally {
       setPhotosLoading(false);
     }
   };
 
-  const getCategoryFromTags = (tags) => {
-    if (!tags || tags.length === 0) return null;
-
-    const categoryMapping = {
-      landscape: "Landscape",
-      nature: "Nature",
-      architecture: "Architecture",
-      temple: "Heritage",
-      beach: "Beach",
-      wildlife: "Wildlife",
-      culture: "Culture",
-      sunset: "Sunset",
-      mountain: "Mountain",
-      forest: "Forest",
-    };
-
-    for (const tag of tags) {
-      const tagTitle = tag.title?.toLowerCase();
-      if (categoryMapping[tagTitle]) {
-        return categoryMapping[tagTitle];
-      }
-    }
-    return null;
-  };
-
   const getDemoPhotos = () => {
-    // Minimal demo photos when API is not available
     return [
       {
         id: "demo1",
@@ -433,11 +327,10 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
 
   const PhotosTab = () => (
     <View style={styles.photosTabContainer}>
-      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search photos by description, photographer, or tags..."
+          placeholder="Search photos..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor="#999"
@@ -455,7 +348,6 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
         )}
       </View>
 
-      {/* Photo Stats */}
       <View style={styles.photoStatsContainer}>
         <Text style={styles.photoStatsText}>
           📸 {filteredPhotos.length} photos available
@@ -534,7 +426,6 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
         )}
       </ScrollView>
 
-      {/* Photo Detail Modal */}
       <Modal
         visible={photoModalVisible}
         animationType="fade"
@@ -657,153 +548,188 @@ const PlaceInfoModal = ({ place, visible, onClose }) => {
   );
 };
 
-// Updated 360° Modal Component
+// FIXED: Enhanced In-App 360° Modal Component
 const InApp360Modal = ({ place, visible, onClose }) => {
-  const [loading, setLoading] = useState(true);
-  const [currentViewType, setCurrentViewType] = useState("360cities");
-  const [webViewKey, setWebViewKey] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [error, setError] = useState(null);
   const webViewRef = useRef(null);
+  // Add after: const [error, setError] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [canZoomIn, setCanZoomIn] = useState(true);
+  const [canZoomOut, setCanZoomOut] = useState(false);
+
+  const sriLanka360URL =
+    "https://www.360cities.net/area/sri-lanka?embed=true&autoplay=true&hideui=true";
 
   useEffect(() => {
-    if (visible && place) {
+    if (visible) {
       setLoading(true);
-      setWebViewKey((prev) => prev + 1);
+      setError(null);
+      setHasLoaded(false);
+    } else {
+      setLoading(false);
+      setError(null);
+      setHasLoaded(false);
     }
-  }, [visible, place, currentViewType]);
+  }, [visible]);
 
-  const get360CitiesURL = () => {
-    const lat = parseFloat(place?.latitude || 0);
-    const lng = parseFloat(place?.longitude || 0);
-    return `https://www.360cities.net/area/sri-lanka?embed=true&autoplay=true&lat=${lat}&lng=${lng}`;
-  };
-
-  const getStreetViewURL = () => {
-    const lat = parseFloat(place?.latitude || 0);
-    const lng = parseFloat(place?.longitude || 0);
-    if (isNaN(lat) || isNaN(lng)) return null;
-    return `https://maps.google.com/maps?q=${lat},${lng}&layer=c&cbll=${lat},${lng}&cbp=11,0,0,0,0&output=embed`;
-  };
-
-  const getGoogleEarthURL = () => {
-    const lat = parseFloat(place?.latitude || 0);
-    const lng = parseFloat(place?.longitude || 0);
-    if (isNaN(lat) || isNaN(lng)) return null;
-    return `https://earth.google.com/web/search/${place.name}/@${lat},${lng},1000a,1000d,35y,0h,0t,0r`;
-  };
-
-  const getCurrentURL = () => {
-    switch (currentViewType) {
-      case "360cities":
-        return get360CitiesURL();
-      case "streetview":
-        return getStreetViewURL();
-      case "googleearth":
-        return getGoogleEarthURL();
-      default:
-        return get360CitiesURL();
+  const handleWebViewLoadStart = () => {
+    if (!hasLoaded) {
+      setLoading(true);
+      setError(null);
     }
   };
 
-  const WebIframeView = () => {
-    const iframeRef = useRef(null);
+  const handleWebViewLoadEnd = () => {
+    setLoading(false);
+    setHasLoaded(true);
+  };
 
-    useEffect(() => {
-      if (iframeRef.current && typeof document !== "undefined") {
-        const iframe = document.createElement("iframe");
-        iframe.src = getCurrentURL();
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-        iframe.style.borderRadius = "12px";
-        iframe.allow =
-          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-        iframe.allowFullScreen = true;
-        iframe.onload = () => setLoading(false);
-        iframe.onerror = () => setLoading(false);
-
-        iframeRef.current.innerHTML = "";
-        iframeRef.current.appendChild(iframe);
-      }
-    }, [currentViewType]);
-
-    return (
-      <div
-        ref={iframeRef}
-        style={{
-          width: "100%",
-          height: "450px",
-          borderRadius: "12px",
-          overflow: "hidden",
-        }}
-      />
+  const handleWebViewError = (syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    console.error("WebView error:", nativeEvent);
+    setLoading(false);
+    setError(
+      "Failed to load 360° panorama. Please check your internet connection."
     );
   };
 
-  const MobileWebView = () => {
-    const currentURL = getCurrentURL();
-    if (!currentURL) {
+  const handleRetry = () => {
+    setError(null);
+    setLoading(true);
+    setHasLoaded(false);
+    if (webViewRef.current) {
+      webViewRef.current.reload();
+    }
+  };
+
+  const WebContent = () => {
+    if (Platform.OS === "web") {
       return (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>
-            Unable to load 360° view for this location
-          </Text>
-        </View>
+        <div style={{ width: "100%", height: "100%", position: "relative" }}>
+          {loading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 1000,
+                textAlign: "center",
+              }}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <div
+                  style={{
+                    border: "4px solid #f3f3f3",
+                    borderTop: "4px solid #0478A7",
+                    borderRadius: "50%",
+                    width: "40px",
+                    height: "40px",
+                    animation: "spin 2s linear infinite",
+                    margin: "0 auto",
+                  }}
+                ></div>
+              </div>
+              <div style={{ color: "#0478A7", fontWeight: "600" }}>
+                Loading 360° Experience...
+              </div>
+            </div>
+          )}
+          <iframe
+            src={sriLanka360URL}
+            style={{
+              width: "100%",
+              height: "450px",
+              border: "none",
+              borderRadius: "12px",
+            }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            onLoad={() => {
+              setLoading(false);
+              setHasLoaded(true);
+            }}
+            onError={() => {
+              setLoading(false);
+              setError("Failed to load 360° panorama");
+            }}
+          />
+        </div>
       );
     }
 
     return (
       <WebView
-        key={webViewKey}
         ref={webViewRef}
-        source={{ uri: currentURL }}
+        source={{ uri: sriLanka360URL }}
         style={styles.webView}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
         javaScriptEnabled={true}
         domStorageEnabled={true}
-        startInLoadingState={true}
-        renderLoading={() => (
-          <View style={styles.webViewLoading}>
-            <ActivityIndicator size="large" color="#0478A7" />
-            <Text style={styles.loadingText}>Loading 360° Experience...</Text>
-          </View>
-        )}
+        allowsInlineMediaPlayback={true}
+        allowsFullscreenVideo={true}
+        scalesPageToFit={true}
+        onLoadStart={handleWebViewLoadStart}
+        onLoadEnd={handleWebViewLoadEnd}
+        onError={handleWebViewError}
+        onHttpError={handleWebViewError}
+        renderLoading={() => null}
+        startInLoadingState={false}
+        mixedContentMode="compatibility"
+        originWhitelist={["*"]}
+        cacheEnabled={true}
       />
     );
   };
 
-  const ViewTypeSelector = () => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.viewTypeSelector}
-      contentContainerStyle={styles.viewTypeSelectorContent}
-    >
-      {[
-        { key: "360cities", label: "🌍 360Cities" },
-        { key: "streetview", label: "🚶 Street View" },
-        { key: "googleearth", label: "🛰️ Earth 3D" },
-      ].map((type) => (
-        <TouchableOpacity
-          key={type.key}
-          style={[
-            styles.viewTypeButton,
-            currentViewType === type.key && styles.activeViewTypeButton,
-          ]}
-          onPress={() => setCurrentViewType(type.key)}
-        >
-          <Text
-            style={[
-              styles.viewTypeButtonText,
-              currentViewType === type.key && styles.activeViewTypeButtonText,
-            ]}
-          >
-            {type.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
+  // Add these functions before const WebContent = () => {
+  const handleZoomIn = () => {
+    if (zoomLevel < 3) {
+      const newZoom = zoomLevel + 0.2;
+      setZoomLevel(newZoom);
+      setCanZoomOut(true);
+      if (newZoom >= 3) setCanZoomIn(false);
+
+      if (webViewRef.current && Platform.OS !== "web") {
+        webViewRef.current.injectJavaScript(`
+        document.body.style.transform = 'scale(${newZoom})';
+        document.body.style.transformOrigin = 'center center';
+        true;
+      `);
+      }
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (zoomLevel > 0.5) {
+      const newZoom = zoomLevel - 0.2;
+      setZoomLevel(newZoom);
+      setCanZoomIn(true);
+      if (newZoom <= 0.5) setCanZoomOut(false);
+
+      if (webViewRef.current && Platform.OS !== "web") {
+        webViewRef.current.injectJavaScript(`
+        document.body.style.transform = 'scale(${newZoom})';
+        document.body.style.transformOrigin = 'center center';
+        true;
+      `);
+      }
+    }
+  };
+
+  const resetZoom = () => {
+    setZoomLevel(1);
+    setCanZoomIn(true);
+    setCanZoomOut(false);
+
+    if (webViewRef.current && Platform.OS !== "web") {
+      webViewRef.current.injectJavaScript(`
+      document.body.style.transform = 'scale(1)';
+      true;
+    `);
+    }
+  };
 
   return (
     <Modal
@@ -815,31 +741,93 @@ const InApp360Modal = ({ place, visible, onClose }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle} numberOfLines={1}>
-            🌍 360° View - {place?.name}
+            🌍 Explore Sri Lanka in 360°
           </Text>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
-
-        <ViewTypeSelector />
-
         <View style={styles.contentContainer}>
-          {loading && (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#0478A7" />
-              <Text style={styles.loadingText}>Loading 360° Experience...</Text>
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={handleRetry}
+              >
+                <Text style={styles.retryButtonText}>Retry</Text>
+              </TouchableOpacity>
             </View>
+          ) : (
+            <>
+              {loading && !hasLoaded && (
+                <View style={styles.loadingOverlay}>
+                  <ActivityIndicator size="large" color="#0478A7" />
+                  <Text style={styles.loadingText}>
+                    Loading 360° Experience...
+                  </Text>
+                </View>
+              )}
+              <WebContent />
+            </>
           )}
-          {Platform.OS === "web" ? <WebIframeView /> : <MobileWebView />}
+        </View>
+        // Add after{" "}
+      </View>{" "}
+      of contentContainer and before{" "}
+      <View style={styles.modalFooter}>
+        <View style={styles.panoramaControls}>
+          <TouchableOpacity
+            style={[styles.zoomButton, !canZoomIn && styles.disabledZoomButton]}
+            onPress={handleZoomIn}
+            disabled={!canZoomIn}
+          >
+            <Text
+              style={[
+                styles.zoomButtonText,
+                !canZoomIn && styles.disabledZoomText,
+              ]}
+            >
+              +
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.zoomLevelIndicator}>
+            <Text style={styles.zoomLevelText}>
+              {Math.round(zoomLevel * 100)}%
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.zoomButton,
+              !canZoomOut && styles.disabledZoomButton,
+            ]}
+            onPress={handleZoomOut}
+            disabled={!canZoomOut}
+          >
+            <Text
+              style={[
+                styles.zoomButtonText,
+                !canZoomOut && styles.disabledZoomText,
+              ]}
+            >
+              −
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.resetZoomButton} onPress={resetZoom}>
+            <Text style={styles.resetZoomText}>Reset</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.modalFooter}>
           <Text style={styles.footerText}>
-            📍 {place?.location}, {place?.province} Province
+            🌍 Immersive 360° panoramic views of Sri Lanka
           </Text>
-          <Text style={styles.footerDescription} numberOfLines={2}>
-            {place?.description}
+          <Text style={styles.footerDescription}>
+            Explore the beautiful landscapes, heritage sites, and stunning
+            locations across the Pearl of the Indian Ocean in full 360° view.
           </Text>
         </View>
       </View>
@@ -847,80 +835,133 @@ const InApp360Modal = ({ place, visible, onClose }) => {
   );
 };
 
-// Enhanced In-App 360Cities Browser Component
+// FIXED: Enhanced In-App 360Cities Browser Component
 const InApp360CitiesBrowser = ({ visible, onClose }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState(null);
-  const [webViewKey, setWebViewKey] = useState(0);
   const webViewRef = useRef(null);
+
   const sriLanka360CitiesURL =
-    "https://www.360cities.net/area/sri-lanka?embed=true";
+    "https://www.360cities.net/area/sri-lanka?embed=true&hideui=true";
+
+  useEffect(() => {
+    if (visible) {
+      setLoading(true);
+      setError(null);
+      setHasLoaded(false);
+    } else {
+      setLoading(false);
+      setError(null);
+      setHasLoaded(false);
+    }
+  }, [visible]);
 
   const handleRetry = () => {
     setError(null);
     setLoading(true);
-    setWebViewKey((prev) => prev + 1); // Force WebView to reload
+    setHasLoaded(false);
+    if (webViewRef.current) {
+      webViewRef.current.reload();
+    }
   };
 
-  const WebBrowserView = () => {
+  const handleWebViewLoadStart = () => {
+    if (!hasLoaded) {
+      setLoading(true);
+      setError(null);
+    }
+  };
+
+  const handleWebViewLoadEnd = () => {
+    setLoading(false);
+    setHasLoaded(true);
+  };
+
+  const handleWebViewError = (syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    console.error("360Cities WebView error:", nativeEvent);
+    setLoading(false);
+    setError(
+      "Failed to load 360Cities panorama. Please check your internet connection."
+    );
+  };
+
+  const WebBrowserContent = () => {
     if (Platform.OS === "web") {
       return (
-        <iframe
-          src={sriLanka360CitiesURL}
-          style={{
-            width: "100%",
-            height: "100%",
-            border: "none",
-            borderRadius: "12px",
-          }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          onLoad={() => setLoading(false)}
-          onError={() => {
-            setLoading(false);
-            setError("Failed to load 360Cities panorama");
-          }}
-        />
+        <div style={{ width: "100%", height: "100%", position: "relative" }}>
+          {loading && !hasLoaded && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 1000,
+                textAlign: "center",
+              }}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <div
+                  style={{
+                    border: "4px solid #f3f3f3",
+                    borderTop: "4px solid #0478A7",
+                    borderRadius: "50%",
+                    width: "40px",
+                    height: "40px",
+                    animation: "spin 2s linear infinite",
+                    margin: "0 auto",
+                  }}
+                ></div>
+              </div>
+              <div style={{ color: "#0478A7", fontWeight: "600" }}>
+                Loading 360Cities...
+              </div>
+            </div>
+          )}
+          <iframe
+            src={sriLanka360CitiesURL}
+            style={{
+              width: "100%",
+              height: "100%",
+              border: "none",
+              borderRadius: "12px",
+            }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            onLoad={() => {
+              setLoading(false);
+              setHasLoaded(true);
+            }}
+            onError={() => {
+              setLoading(false);
+              setError("Failed to load 360Cities panorama");
+            }}
+          />
+        </div>
       );
     }
 
     return (
       <WebView
-        key={webViewKey}
         ref={webViewRef}
         source={{ uri: sriLanka360CitiesURL }}
         style={styles.browserWebView}
         javaScriptEnabled={true}
         domStorageEnabled={true}
-        startInLoadingState={true}
-        scalesPageToFit={true}
         allowsFullscreenVideo={true}
         allowsInlineMediaPlayback={true}
-        onLoadStart={() => {
-          setLoading(true);
-          setError(null);
-        }}
-        onLoadEnd={() => setLoading(false)}
-        onError={() => {
-          setLoading(false);
-          setError("Failed to load 360Cities panorama");
-        }}
-        renderLoading={() => (
-          <View style={styles.browserLoading}>
-            <ActivityIndicator size="large" color="#0478A7" />
-            <Text style={styles.browserLoadingText}>Loading 360Cities...</Text>
-          </View>
-        )}
-        renderError={() => (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
-              {error || "Failed to load 360Cities panorama"}
-            </Text>
-            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        scalesPageToFit={true}
+        onLoadStart={handleWebViewLoadStart}
+        onLoadEnd={handleWebViewLoadEnd}
+        onError={handleWebViewError}
+        onHttpError={handleWebViewError}
+        renderLoading={() => null}
+        startInLoadingState={false}
+        mixedContentMode="compatibility"
+        originWhitelist={["*"]}
+        cacheEnabled={true}
       />
     );
   };
@@ -952,7 +993,17 @@ const InApp360CitiesBrowser = ({ visible, onClose }) => {
               </TouchableOpacity>
             </View>
           ) : (
-            <WebBrowserView />
+            <>
+              {loading && !hasLoaded && (
+                <View style={styles.browserLoading}>
+                  <ActivityIndicator size="large" color="#0478A7" />
+                  <Text style={styles.browserLoadingText}>
+                    Loading 360Cities...
+                  </Text>
+                </View>
+              )}
+              <WebBrowserContent />
+            </>
           )}
         </View>
       </View>
@@ -960,127 +1011,105 @@ const InApp360CitiesBrowser = ({ visible, onClose }) => {
   );
 };
 
-// Enhanced Web Map Component with Zoom Controls
+// FIXED: Enhanced Web Map Component
 const WebMap = ({ places, selectedPlace, onSelectPlace }) => {
   if (Platform.OS !== "web") return null;
 
   const mapContainerRef = React.useRef(null);
-  const [zoomLevel, setZoomLevel] = useState(8);
-  const [mapCenter, setMapCenter] = useState({ lat: 7.8731, lng: 80.7718 });
+  const [mapInitialized, setMapInitialized] = useState(false);
+  const [currentBounds, setCurrentBounds] = useState(null);
 
   React.useEffect(() => {
-    if (mapContainerRef.current && typeof document !== "undefined") {
-      const loadMap = () => {
-        const iframe = document.createElement("iframe");
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-        iframe.style.borderRadius = "10px";
-
-        let mapUrl;
-        if (
-          selectedPlace &&
-          selectedPlace.latitude &&
-          selectedPlace.longitude
-        ) {
-          const lat = parseFloat(selectedPlace.latitude);
-          const lng = parseFloat(selectedPlace.longitude);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            const delta = 0.2 / Math.pow(2, zoomLevel - 8);
-            mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
-              lng - delta
-            },${lat - delta},${lng + delta},${
-              lat + delta
-            }&layer=mapnik&marker=${lat},${lng}`;
-            setMapCenter({ lat, lng });
-          }
-        } else {
-          const delta = 4.5 / Math.pow(2, zoomLevel - 8);
-          mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
-            mapCenter.lng - delta
-          },${mapCenter.lat - delta},${mapCenter.lng + delta},${
-            mapCenter.lat + delta
-          }&layer=mapnik`;
-        }
-
-        iframe.src = mapUrl;
-        iframe.title = "Sri Lanka Map";
-
-        if (mapContainerRef.current) {
-          mapContainerRef.current.innerHTML = "";
-          mapContainerRef.current.appendChild(iframe);
-        }
-      };
-      loadMap();
+    if (
+      mapContainerRef.current &&
+      typeof document !== "undefined" &&
+      !mapInitialized
+    ) {
+      initializeMap();
+      setMapInitialized(true);
     }
-  }, [selectedPlace, zoomLevel, mapCenter]);
+  }, []);
 
-  const handleZoomIn = () => {
-    if (zoomLevel < 15) {
-      setZoomLevel((prev) => prev + 1);
+  React.useEffect(() => {
+    if (
+      mapInitialized &&
+      selectedPlace &&
+      selectedPlace.latitude &&
+      selectedPlace.longitude
+    ) {
+      updateMapForSelectedPlace();
     }
+  }, [selectedPlace, mapInitialized]);
+
+  const initializeMap = () => {
+    if (!mapContainerRef.current) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "none";
+    iframe.style.borderRadius = "10px";
+    iframe.title = "Sri Lanka Map";
+
+    const defaultBounds = {
+      minLng: 79.5,
+      minLat: 5.9,
+      maxLng: 81.9,
+      maxLat: 9.9,
+    };
+
+    const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${defaultBounds.minLng},${defaultBounds.minLat},${defaultBounds.maxLng},${defaultBounds.maxLat}&layer=mapnik`;
+    iframe.src = mapUrl;
+
+    mapContainerRef.current.innerHTML = "";
+    mapContainerRef.current.appendChild(iframe);
+    setCurrentBounds(defaultBounds);
   };
 
-  const handleZoomOut = () => {
-    if (zoomLevel > 5) {
-      setZoomLevel((prev) => prev - 1);
+  const updateMapForSelectedPlace = () => {
+    if (!mapContainerRef.current || !selectedPlace) return;
+
+    const lat = parseFloat(selectedPlace.latitude);
+    const lng = parseFloat(selectedPlace.longitude);
+
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    const delta = 0.2;
+    const newBounds = {
+      minLng: lng - delta,
+      minLat: lat - delta,
+      maxLng: lng + delta,
+      maxLat: lat + delta,
+    };
+
+    if (
+      !currentBounds ||
+      Math.abs(currentBounds.minLng - newBounds.minLng) > 0.01 ||
+      Math.abs(currentBounds.minLat - newBounds.minLat) > 0.01
+    ) {
+      const iframe = mapContainerRef.current.querySelector("iframe");
+      if (iframe) {
+        const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${newBounds.minLng},${newBounds.minLat},${newBounds.maxLng},${newBounds.maxLat}&layer=mapnik&marker=${lat},${lng}`;
+        iframe.src = mapUrl;
+        setCurrentBounds(newBounds);
+      }
     }
   };
 
   const handleResetView = () => {
-    setZoomLevel(8);
-    setMapCenter({ lat: 7.8731, lng: 80.7718 });
+    if (mapInitialized) {
+      setMapInitialized(false);
+      setTimeout(() => {
+        initializeMap();
+        setMapInitialized(true);
+      }, 100);
+    }
   };
 
   return (
     <View style={{ width: "100%", height: "100%", position: "relative" }}>
-      <div
-        ref={mapContainerRef}
-        style={{ width: "100%", height: "100%" }}
-      ></div>
-
-      {/* Zoom Controls */}
+      <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
       <View style={styles.webMapControls}>
-        <TouchableOpacity
-          style={[
-            styles.mapControlButton,
-            zoomLevel >= 15 && styles.disabledButton,
-          ]}
-          onPress={handleZoomIn}
-          disabled={zoomLevel >= 15}
-        >
-          <Text
-            style={[
-              styles.mapControlText,
-              zoomLevel >= 15 && styles.disabledText,
-            ]}
-          >
-            +
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.zoomLevelDisplay}>
-          <Text style={styles.zoomLevelText}>{zoomLevel}</Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.mapControlButton,
-            zoomLevel <= 5 && styles.disabledButton,
-          ]}
-          onPress={handleZoomOut}
-          disabled={zoomLevel <= 5}
-        >
-          <Text
-            style={[
-              styles.mapControlText,
-              zoomLevel <= 5 && styles.disabledText,
-            ]}
-          >
-            −
-          </Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.resetButton} onPress={handleResetView}>
           <Text style={styles.resetButtonText}>🏠</Text>
         </TouchableOpacity>
@@ -1089,15 +1118,16 @@ const WebMap = ({ places, selectedPlace, onSelectPlace }) => {
   );
 };
 
-// Enhanced Mobile Map Component with Zoom Controls
+// FIXED: Enhanced Mobile Map Component
 const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
   if (Platform.OS === "web") return null;
 
   const mapRef = useRef(null);
   const [currentRegion, setCurrentRegion] = useState(SRI_LANKA_CENTER);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
-    if (mapRef.current) {
+    if (mapRef.current && mapReady) {
       mapRef.current.fitToCoordinates(
         [
           {
@@ -1115,10 +1145,15 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         }
       );
     }
-  }, []);
+  }, [mapReady]);
 
   useEffect(() => {
-    if (selectedPlace && selectedPlace.latitude && selectedPlace.longitude) {
+    if (
+      selectedPlace &&
+      selectedPlace.latitude &&
+      selectedPlace.longitude &&
+      mapReady
+    ) {
       const lat = parseFloat(selectedPlace.latitude);
       const lng = parseFloat(selectedPlace.longitude);
 
@@ -1130,19 +1165,30 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
           longitudeDelta: 0.25,
         };
 
-        setCurrentRegion(newRegion);
-        if (mapRef.current) {
-          mapRef.current.animateToRegion(newRegion, 1000);
+        const shouldAnimate =
+          !currentRegion ||
+          Math.abs(currentRegion.latitude - lat) > 0.1 ||
+          Math.abs(currentRegion.longitude - lng) > 0.1;
+
+        if (shouldAnimate) {
+          setCurrentRegion(newRegion);
+          if (mapRef.current) {
+            mapRef.current.animateToRegion(newRegion, 1000);
+          }
         }
       }
     }
-  }, [selectedPlace, places]);
+  }, [selectedPlace, mapReady]);
+
+  const handleMapReady = () => {
+    setMapReady(true);
+  };
 
   const handleZoomIn = () => {
     const newRegion = {
       ...currentRegion,
-      latitudeDelta: currentRegion.latitudeDelta * 0.5,
-      longitudeDelta: currentRegion.longitudeDelta * 0.5,
+      latitudeDelta: Math.max(currentRegion.latitudeDelta * 0.5, 0.01),
+      longitudeDelta: Math.max(currentRegion.longitudeDelta * 0.5, 0.01),
     };
     setCurrentRegion(newRegion);
     if (mapRef.current) {
@@ -1181,6 +1227,7 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         initialRegion={SRI_LANKA_CENTER}
+        onMapReady={handleMapReady}
         onRegionChangeComplete={onRegionChangeComplete}
         zoomEnabled={true}
         scrollEnabled={true}
@@ -1188,6 +1235,9 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         showsMyLocationButton={false}
         showsCompass={true}
         showsScale={true}
+        loadingEnabled={true}
+        loadingIndicatorColor="#0478A7"
+        loadingBackgroundColor="#f9f9f9"
       >
         {places.map((place, index) => {
           if (place.latitude && place.longitude) {
@@ -1197,7 +1247,7 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
             if (!isNaN(lat) && !isNaN(lng)) {
               return (
                 <Marker
-                  key={index}
+                  key={`${place.name}-${index}`}
                   coordinate={{ latitude: lat, longitude: lng }}
                   title={place.name}
                   description={place.category || "Tourist Destination"}
@@ -1211,7 +1261,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         })}
       </MapView>
 
-      {/* Mobile Zoom Controls */}
       <View style={styles.mobileMapControls}>
         <TouchableOpacity
           style={[
@@ -1254,7 +1303,6 @@ const MobileMap = ({ places, selectedPlace, onSelectPlace }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Zoom Level Indicator */}
       <View style={styles.zoomIndicator}>
         <Text style={styles.zoomIndicatorText}>
           Zoom: {Math.round(Math.log2(10 / currentRegion.latitudeDelta))}
@@ -1272,7 +1320,6 @@ export default function Maps() {
   const [error, setError] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
 
-  // Modal states
   const [inApp360Visible, setInApp360Visible] = useState(false);
   const [selectedPlaceFor360, setSelectedPlaceFor360] = useState(null);
   const [browser360Visible, setBrowser360Visible] = useState(false);
@@ -1397,7 +1444,6 @@ export default function Maps() {
     }
   };
 
-  // Modal handlers
   const handle360ViewOpen = (place) => {
     setSelectedPlaceFor360(place);
     setInApp360Visible(true);
@@ -1458,7 +1504,6 @@ export default function Maps() {
         )}
       </View>
 
-      {/* Enhanced 360Cities Banner */}
       <TouchableOpacity
         style={styles.bannerButton}
         onPress={handleBrowser360Open}
@@ -1503,7 +1548,6 @@ export default function Maps() {
                 selectedPlace === place ? styles.selectedPlaceItem : null,
               ]}
             >
-              {/* Main content area */}
               <TouchableOpacity
                 style={styles.placeMainContent}
                 onPress={() => handleSelectPlace(place)}
@@ -1523,7 +1567,6 @@ export default function Maps() {
                 </Text>
               </TouchableOpacity>
 
-              {/* Action buttons row */}
               <View style={styles.placeButtonRow}>
                 <TouchableOpacity
                   style={styles.actionButton360}
@@ -1545,7 +1588,6 @@ export default function Maps() {
         )}
       </View>
 
-      {/* Modals */}
       <InApp360Modal
         place={selectedPlaceFor360}
         visible={inApp360Visible}
@@ -1975,6 +2017,17 @@ const styles = StyleSheet.create({
     color: "#999",
     textAlign: "center",
   },
+  photosLoadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 40,
+  },
+  photosLoadingText: {
+    marginTop: 10,
+    color: "#666",
+    fontSize: 16,
+  },
   photoModalContainer: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.9)",
@@ -2192,50 +2245,12 @@ const styles = StyleSheet.create({
     color: "#666",
     fontWeight: "bold",
   },
-  viewTypeSelector: {
-    backgroundColor: "#f8f9fa",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  viewTypeSelectorContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  viewTypeButton: {
-    backgroundColor: "#e9ecef",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 10,
-    minWidth: 100,
-    alignItems: "center",
-  },
-  activeViewTypeButton: {
-    backgroundColor: "#0478A7",
-  },
-  viewTypeButtonText: {
-    fontSize: 14,
-    color: "#666",
-    fontWeight: "500",
-  },
-  activeViewTypeButtonText: {
-    color: "white",
-    fontWeight: "600",
-  },
   contentContainer: {
     flex: 1,
     position: "relative",
   },
   webView: {
     flex: 1,
-  },
-  webViewLoading: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -50 }, { translateY: -50 }],
-    alignItems: "center",
-    zIndex: 1000,
   },
   loadingOverlay: {
     position: "absolute",
@@ -2309,7 +2324,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   browserHeaderSpacer: {
-    width: 60, // To balance the back button
+    width: 60,
   },
   browserContent: {
     flex: 1,
@@ -2382,19 +2397,6 @@ const styles = StyleSheet.create({
   disabledText: {
     color: "#999",
   },
-  zoomLevelDisplay: {
-    backgroundColor: "#f8f9fa",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-    marginBottom: 5,
-    alignItems: "center",
-  },
-  zoomLevelText: {
-    fontSize: 12,
-    color: "#666",
-    fontWeight: "500",
-  },
   resetButton: {
     backgroundColor: "#17a2b8",
     width: 40,
@@ -2410,9 +2412,81 @@ const styles = StyleSheet.create({
   resetButtonText: {
     fontSize: 16,
   },
+  zoomIndicator: {
+    position: "absolute",
+    bottom: 15,
+    left: 15,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
   zoomIndicatorText: {
     color: "white",
     fontSize: 12,
     fontWeight: "500",
+  },
+  panoramaControls: {
+    position: "absolute",
+    bottom: 80,
+    right: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: 12,
+    padding: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
+    zIndex: 1000,
+  },
+  zoomButton: {
+    backgroundColor: "#0478A7",
+    width: 45,
+    height: 45,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 3,
+  },
+  disabledZoomButton: {
+    backgroundColor: "#ccc",
+    opacity: 0.6,
+  },
+  zoomButtonText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  disabledZoomText: {
+    color: "#999",
+  },
+  zoomLevelIndicator: {
+    backgroundColor: "#f8f9fa",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginBottom: 8,
+    alignItems: "center",
+  },
+  zoomLevelText: {
+    fontSize: 12,
+    color: "#666",
+    fontWeight: "500",
+  },
+  resetZoomButton: {
+    backgroundColor: "#17a2b8",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  resetZoomText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
