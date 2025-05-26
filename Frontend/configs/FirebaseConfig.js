@@ -8,6 +8,9 @@ import {
   doc,
   updateDoc,
   increment,
+  deleteDoc,
+  arrayUnion, 
+  arrayRemove
 } from "firebase/firestore";
 
 // Firebase configuration
@@ -27,4 +30,5 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // Export initialized instances
-export { app, auth, db, collection, addDoc, doc, updateDoc, increment };
+export { app, auth, db, collection, addDoc, doc, updateDoc, increment, deleteDoc ,arrayUnion, 
+  arrayRemove};

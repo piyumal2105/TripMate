@@ -5,14 +5,17 @@ import {
   StyleSheet,
   TouchableOpacity,
   ToastAndroid,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors } from "./../../../constants/Colors";
 import { useNavigation, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, db } from "./../../../configs/FirebaseConfig"; // Ensure db is imported
-import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
+import { auth, db } from "./../../../configs/FirebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export default function SignUp() {
   const navigation = useNavigation();
@@ -20,13 +23,49 @@ export default function SignUp() {
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [fullName, setFullName] = useState(); // Fixed typo: setFulName → setFullName
+  const [fullName, setFullName] = useState();
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [base64Image, setBase64Image] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, []);
+
+  // Function to pick and process a profile picture
+  const pickProfilePicture = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1], // Square aspect ratio
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const asset = result.assets[0];
+        // Resize image to 100x100 to fit Firestore limit
+        const manipulatedImage = await ImageManipulator.manipulateAsync(
+          asset.uri,
+          [{ resize: { width: 100, height: 100 } }],
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        );
+        setProfilePicture(manipulatedImage.uri);
+
+        // Convert to base64
+        const base64 = await ImageManipulator.manipulateAsync(
+          manipulatedImage.uri,
+          [],
+          { base64: true }
+        );
+        setBase64Image(base64.base64);
+      }
+    } catch (error) {
+      console.error("Error picking profile picture:", error);
+      ToastAndroid.show("Failed to pick image. Please try again.", ToastAndroid.LONG);
+    }
+  };
 
   const OnCreateAccount = async () => {
     if (!email || !password || !fullName) {
@@ -36,6 +75,7 @@ export default function SignUp() {
 
     try {
       // Create user in Firebase Authentication
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -44,13 +84,16 @@ export default function SignUp() {
       const user = userCredential.user;
       console.log("User created:", user);
 
-      // Update Firebase Auth profile with displayName
+      // Prepare photoURL with base64 if available
+      const photoURL = base64Image ? `data:image/jpeg;base64,${base64Image}` : null;
+
+      // Update Firebase Auth profile
       await updateProfile(user, {
         displayName: fullName,
+        photoURL: photoURL || null,
       });
-      console.log("Display name updated successfully in Firebase Auth");
 
-      // Save fullName to Firestore
+      // Save user data to Firestore including base64 image
       await setDoc(doc(db, "users", user.uid), {
         fullName: fullName,
         email: email,
@@ -71,14 +114,7 @@ export default function SignUp() {
   };
 
   return (
-    <View
-      style={{
-        padding: 25,
-        paddingTop: 50,
-        backgroundColor: Colors.WHITE,
-        height: "100%",
-      }}
-    >
+    <View style={{ padding: 25, paddingTop: 50, backgroundColor: Colors.WHITE, height: "100%" }}>
       <TouchableOpacity onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
@@ -89,7 +125,8 @@ export default function SignUp() {
         <TextInput
           style={styles.input}
           placeholder="Enter Full Name"
-          onChangeText={(value) => setFullName(value)} // Fixed typo
+          onChangeText={(value) => setFullName(value)}
+          value={fullName}
         />
       </View>
 
@@ -99,6 +136,7 @@ export default function SignUp() {
           style={styles.input}
           onChangeText={(value) => setEmail(value)}
           placeholder="Enter Email"
+          value={email}
         />
       </View>
 
@@ -109,6 +147,7 @@ export default function SignUp() {
           style={styles.input}
           onChangeText={(value) => setPassword(value)}
           placeholder="Enter Password"
+          value={password}
         />
       </View>
 
