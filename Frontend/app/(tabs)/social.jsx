@@ -533,6 +533,12 @@ const PostFeed = () => {
         <Text style={styles.headerTitle}>Social Feed</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
+            style={{ backgroundColor: '#f0f0f0', borderRadius: 20, padding: 5, marginRight: 10 }}
+            onPress={() => router.push('/GoalsScreen/Goals')}
+          >
+            <Ionicons name="trophy-outline" size={28} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity
             style={{
               backgroundColor: '#f0f0f0',
               borderRadius: 20,
@@ -540,7 +546,7 @@ const PostFeed = () => {
               marginRight: 10,
               position: 'relative',
             }}
-            onPress={() => router.push('ChatScreen/ChatScreen')}
+            onPress={() => router.push('/ChatScreen/ChatScreen')}
           >
             <Ionicons name="chatbubble-outline" size={28} color="#000" />
             {unreadMessageCount > 0 && (
@@ -566,7 +572,7 @@ const PostFeed = () => {
               borderRadius: 20,
               padding: 5,
             }}
-            onPress={() => router.push('UserProfileScreen/UserProfileScreen')}
+            onPress={() => router.push('/UserProfileScreen/UserProfileScreen')}
           >
             <Ionicons name="person-outline" size={28} color="#000" />
           </TouchableOpacity>
