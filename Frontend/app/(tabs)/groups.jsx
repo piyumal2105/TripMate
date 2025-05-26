@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { auth } from '../../configs/FirebaseConfig';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for icons
+import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
 
 const db = getFirestore();
 
@@ -11,24 +11,38 @@ export default function Groups() {
   const [loading, setLoading] = useState(false);
   const [userNames, setUserNames] = useState({});
   const [showContent, setShowContent] = useState(false);
+  const [hasGroupPreference, setHasGroupPreference] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [sentRequests, setSentRequests] = useState(new Set());
+  const [friends, setFriends] = useState(new Set());
 
-  // Function to fetch recommendations
   const fetchRecommendations = async (userId) => {
     setLoading(true);
     try {
+      console.log('Fetching recommendations for userId:', userId);
       const response = await fetch(`http://localhost:8000/recommend/?uuid=${userId}`);
       const result = await response.json();
-      console.log('API Response:', result);
+      console.log('Full API Response:', JSON.stringify(result, null, 2));
       setData(result);
 
       if (result.matchingUsers && result.matchingUsers.length > 0) {
+        console.log('Matching Users found:', result.matchingUsers);
         const namePromises = result.matchingUsers.map(async (uuid) => {
-          const userDoc = await getDoc(doc(db, "users", uuid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            return { uuid, name: userData.fullName || "Unknown User" };
+          let userDoc, userData;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            userDoc = await getDoc(doc(db, "users", uuid));
+            if (userDoc.exists()) break;
+            console.log(`Retry attempt ${attempt + 1} for user ${uuid} failed, waiting...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-          return { uuid, name: "Unknown User" };
+          if (userDoc.exists()) {
+            userData = userDoc.data();
+            console.log(`User ${uuid} name:`, userData.fullName || "Unknown User");
+            return { uuid, name: userData.fullName || "Unknown User" };
+          } else {
+            console.log(`User ${uuid} not found in Firestore after retries`);
+            return { uuid, name: "Unknown User (Not Found)" };
+          }
         });
 
         const resolvedNames = await Promise.all(namePromises);
@@ -36,8 +50,10 @@ export default function Groups() {
           acc[uuid] = name;
           return acc;
         }, {});
+        console.log('User Names Map:', nameMap);
         setUserNames(nameMap);
       } else {
+        console.log('No matching users in API response');
         setUserNames({});
       }
     } catch (error) {
@@ -49,35 +65,143 @@ export default function Groups() {
     }
   };
 
-  useEffect(() => {
-    if (!showContent) return;
+  const checkGroupPreference = async (userId) => {
+    try {
+      const preferencesDoc = await getDoc(doc(db, "userPreferences", userId));
+      if (preferencesDoc.exists()) {
+        const prefs = preferencesDoc.data();
+        const travelPreferences = prefs.travelPreferences || [];
+        setHasGroupPreference(travelPreferences.includes("Group"));
+      } else {
+        setHasGroupPreference(false);
+      }
+    } catch (error) {
+      console.error("Error checking group preference:", error);
+      setHasGroupPreference(false);
+    }
+  };
 
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+  const checkSentRequests = (userId) => {
+    try {
+      const requestsRef = collection(db, 'friendRequests');
+      const q = query(requestsRef, where('fromUserId', '==', userId), where('status', '==', 'pending'));
+      return onSnapshot(q, (snapshot) => {
+        const requestIds = new Set(snapshot.docs.map(doc => doc.data().toUserId));
+        setSentRequests(requestIds);
+      }, (error) => {
+        console.error('Error listening to sent requests:', error);
+      });
+    } catch (error) {
+      console.error('Error checking sent requests:', error);
+      return () => {}; // Return empty cleanup function on error
+    }
+  };
+
+  useEffect(() => {
+    let unsubscribeFriends = () => {};
+    let unsubscribeRequests = () => {};
+    let unsubscribeAuth = () => {};
+
+    unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+      // Clean up previous listeners before setting new ones
+      unsubscribeFriends();
+      unsubscribeRequests();
+
       if (user) {
         const userId = user.uid;
-        console.log("User is signed in:", userId);
-        fetchRecommendations(userId);
+        setCurrentUserId(userId);
+        console.log('User signed in:', userId);
+        if (showContent) {
+          if (hasGroupPreference) {
+            fetchRecommendations(userId);
+          }
+        } else {
+          await checkGroupPreference(userId);
+        }
+        const friendsRef = collection(db, 'friends', userId, 'friendList');
+        unsubscribeFriends = onSnapshot(friendsRef, (snapshot) => {
+          const friendIds = new Set(snapshot.docs.map(doc => doc.data().friendId));
+          setFriends(friendIds);
+        }, (error) => {
+          console.error('Error listening to friends:', error);
+        });
+        unsubscribeRequests = checkSentRequests(userId);
       } else {
         console.log('User is not logged in');
         setData({ error: 'User not logged in' });
         setLoading(false);
+        setHasGroupPreference(null);
+        setFriends(new Set());
+        setSentRequests(new Set());
+        setUserNames({});
+        setCurrentUserId(null);
       }
     });
 
-    return () => unsubscribe();
-  }, [showContent]);
+    return () => {
+      unsubscribeAuth();
+      unsubscribeFriends();
+      unsubscribeRequests();
+    };
+  }, [showContent, hasGroupPreference]);
 
   const handleSmartConnectClick = () => {
     setShowContent(true);
   };
 
   const handleRediscoverClick = () => {
-    const user = auth.currentUser;
-    if (user) {
-      fetchRecommendations(user.uid); // Re-run the API call
+    if (currentUserId) {
+      fetchRecommendations(currentUserId);
     } else {
       console.log('No user logged in for rediscovery');
       setData({ error: 'User not logged in' });
+    }
+  };
+
+  const handleGoToProfile = () => {
+    window.location.href = "/UserProfileScreen/UserProfileScreen";
+  };
+
+  const sendFriendRequest = async (toUserId) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser || !toUserId) {
+      Alert.alert('Error', 'You must be logged in to send a friend request');
+      return;
+    }
+
+    if (toUserId === currentUser.uid) {
+      Alert.alert('Error', 'You cannot send a friend request to yourself');
+      return;
+    }
+
+    if (friends.has(toUserId)) {
+      Alert.alert('Info', 'This user is already your friend');
+      return;
+    }
+
+    try {
+      const sentRequestsQuery = await getDocs(query(
+        collection(db, 'friendRequests'),
+        where('fromUserId', '==', currentUser.uid),
+        where('toUserId', '==', toUserId),
+        where('status', '==', 'pending')
+      ));
+      if (!sentRequestsQuery.empty) {
+        Alert.alert('Info', 'You have already sent a friend request to this user');
+        return;
+      }
+
+      const requestData = {
+        fromUserId: currentUser.uid,
+        toUserId,
+        status: 'pending',
+        createdAt: new Date(),
+      };
+      await addDoc(collection(db, 'friendRequests'), requestData);
+      Alert.alert('Success', 'Friend request sent!');
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      Alert.alert('Error', 'Failed to send friend request. Please try again.');
     }
   };
 
@@ -96,11 +220,25 @@ export default function Groups() {
     );
   }
 
-  if (loading) {
+  if (loading || hasGroupPreference === null) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0478A7" />
-        <Text style={styles.loadingText}>Loading your recommendations...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!hasGroupPreference) {
+    return (
+      <View style={styles.noGroupContainer}>
+        <Text style={styles.noGroupText}>
+          You did not select Group as a travel preference. If you want, you can add it.
+        </Text>
+        <TouchableOpacity style={styles.goToProfileButton} onPress={handleGoToProfile}>
+          <Ionicons name="person-outline" size={24} color="#fff" style={styles.buttonIcon} />
+          <Text style={styles.goToProfileButtonText}>Go to Profile</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -109,14 +247,35 @@ export default function Groups() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.sectionTitle}>Suggested Travellers for You</Text>
       <View style={styles.card}>
-        {data?.matchingUsers?.length > 0 ? (
-          data.matchingUsers.map((uuid, index) => (
-            <View key={index} style={styles.userItem}>
-              <Text style={styles.userName}>{userNames[uuid] || uuid}</Text>
-            </View>
-          ))
+        {data?.matchingUsers?.length > 0 && Object.keys(userNames).length > 0 ? (
+          data.matchingUsers
+            .filter((uuid) => userNames[uuid])
+            .slice(0, 5)
+            .map((uuid, index) => (
+              <View key={index} style={styles.userItem}>
+                <Text style={styles.userName}>{userNames[uuid]}</Text>
+                <TouchableOpacity
+                  style={styles.addFriendButton}
+                  onPress={() => sendFriendRequest(uuid)}
+                  disabled={friends.has(uuid) || sentRequests.has(uuid)}
+                >
+                  <Ionicons
+                    name={friends.has(uuid) ? "people" : sentRequests.has(uuid) ? "checkmark" : "person-add-outline"}
+                    size={18}
+                    color={friends.has(uuid) ? "#28a745" : sentRequests.has(uuid) ? "#28a745" : "#0478A7"}
+                  />
+                  <Text style={styles.addFriendButtonText}>
+                    {friends.has(uuid) ? "Friends" : sentRequests.has(uuid) ? "Requested" : "Add Friend"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ))
         ) : (
-          <Text style={styles.noDataText}>No matching travelers found.</Text>
+          <Text style={styles.noDataText}>
+            {data?.matchingUsers?.length === 0
+              ? "No matching travelers found. Try updating your preferences to find better matches!"
+              : "Some traveler names are unavailable (e.g., 'Unknown User'). This may be due to missing data. Try refreshing or contact support if the issue persists."}
+          </Text>
         )}
       </View>
 
@@ -135,7 +294,6 @@ export default function Groups() {
         )}
       </View>
 
-      {/* Re-Discover Button */}
       <TouchableOpacity style={styles.rediscoverButton} onPress={handleRediscoverClick}>
         <Ionicons name="refresh-outline" size={24} color="#fff" style={styles.buttonIcon} />
         <Text style={styles.rediscoverButtonText}>Discover Again</Text>
@@ -145,7 +303,6 @@ export default function Groups() {
 }
 
 const styles = StyleSheet.create({
-  // Intro Section Styles
   introContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -164,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 16,
     marginBottom: 30,
     paddingHorizontal: 10,
   },
@@ -191,8 +348,40 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
-
-  // Existing Styles
+  noGroupContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f7fa',
+    padding: 20,
+  },
+  noGroupText: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  goToProfileButton: {
+    flexDirection: 'row',
+    backgroundColor: '#0478A7',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  goToProfileButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f7fa',
@@ -237,11 +426,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6f3f7',
     borderRadius: 8,
     marginVertical: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   userName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#0478A7',
+  },
+  addFriendButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0f7fa',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#0478A7',
+  },
+  addFriendButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0478A7',
+    marginLeft: 5,
   },
   placeCard: {
     padding: 15,
@@ -274,7 +482,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 10,
   },
-  // Re-Discover Button Styles
   rediscoverButton: {
     flexDirection: 'row',
     backgroundColor: '#0478A7',
@@ -288,7 +495,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'center', // Center horizontally
+    alignSelf: 'center',
     marginTop: 20,
   },
   rediscoverButtonText: {
