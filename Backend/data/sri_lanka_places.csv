@@ -1,0 +1,276 @@
+name,location,province,description,category,latitude,longitude
+Mirissa Beach,Mirissa,Southern,"A stunning crescent-shaped beach known for whale watching and surfing, with golden sand and turquoise waters.",Beaches,5.9483,80.4716
+Unawatuna Beach,Unawatuna,Southern,"A popular horseshoe-shaped beach with calm waters ideal for swimming and snorkeling, bordered by coconut palms.",Beaches,6.0169,80.2496
+Bentota Beach,Bentota,Southern,A long stretch of golden sand beach famous for water sports and ayurvedic spa resorts.,Beaches,6.4213,79.9989
+Arugam Bay,Pottuvil,Eastern,One of Asia's best surfing destinations with a laid-back atmosphere and beautiful curved bay.,Beaches,7.8986,81.5968
+Pasikuda Beach,Pasikuda,Eastern,"Known for its shallow coastline where visitors can walk far into the ocean, with crystal clear waters.",Beaches,7.6258,81.5299
+Uppuveli Beach,Trincomalee,Eastern,"A serene beach with calm waters and golden sand, perfect for swimming and relaxation.",Beaches,8.5922,81.2016
+Nilaveli Beach,Trincomalee,Eastern,"A pristine white sand beach with crystal clear waters, gateway to Pigeon Island National Park.",Beaches,8.5922,81.2016
+Kalkudah Beach,Kalkudah,Eastern,"A long, wide stretch of pristine beach with shallow waters, ideal for swimming.",Beaches,7.8701,81.4960
+Hikkaduwa Beach,Hikkaduwa,Southern,"Famous for coral reefs and marine life, popular for snorkeling and glass-bottom boat tours.",Beaches,6.1395,80.1063
+Tangalle Beach,Tangalle,Southern,"Secluded beach with rocky outcrops and peaceful atmosphere, known for sea turtle nesting.",Beaches,6.1104,80.1871
+Weligama Bay,Weligama,Southern,A wide bay known for beginner-friendly surfing and traditional stilt fishermen.,Beaches,6.1471,80.0285
+Koggala Beach,Koggala,Southern,"A long stretch of relatively undeveloped beach, known for stilt fishing and sea turtle hatcheries.",Beaches,5.9795,80.1698
+Dickwella Beach,Dickwella,Southern,A sheltered bay with calm waters perfect for swimming and relaxation.,Beaches,6.1478,80.0760
+Polhena Beach,Matara,Southern,"A natural swimming pool protected by an offshore reef, ideal for swimming and snorkeling.",Beaches,5.9549,80.5550
+Casuarina Beach,Jaffna,Northern,"Named after casuarina trees lining the shore, offering peaceful views and shallow waters.",Beaches,9.6615,80.0255
+Mount Lavinia Beach,Colombo,Western,"A popular city beach with golden sands and vibrant nightlife, close to Colombo.",Beaches,6.9271,79.8612
+Negombo Beach,Negombo,Western,"A wide sandy beach with a lively atmosphere, close to the international airport.",Beaches,7.2008,79.8737
+Kalpitiya Beach,Kalpitiya,North Western,"Known for kitesurfing and dolphin watching, with a rustic, undeveloped feel.",Beaches,7.6159,80.1757
+Beruwala Beach,Beruwala,Western,The first Muslim settlement in Sri Lanka with a golden stretch of sand.,Beaches,7.0431,79.7653
+Induruwa Beach,Induruwa,Western,A quiet beach destination with fewer crowds and a peaceful atmosphere.,Beaches,7.0637,79.9148
+Talalla Beach,Talalla,Southern,"A large bay with white sand and turquoise waters, relatively undiscovered.",Beaches,5.9480,80.1157
+Trincomalee Harbor Beach,Trincomalee,Eastern,One of the world's largest natural harbors with scenic views and historical significance.,Beaches,8.5922,81.2016
+Ventura Beach,Colombo,Western,An urban beach park with recreational facilities and ocean views.,Beaches,6.9271,79.8612
+Marble Beach,Trincomalee,Eastern,A small cove with unique marble-like smooth rocks and clear blue waters.,Beaches,8.5922,81.2016
+Wijaya Beach,Dalawella,Southern,A small beach with a natural rock pool and famous rope swing for photos.,Beaches,5.9335,80.2091
+Marakolliya Beach,Tangalle,Southern,An isolated beach stretch with minimal development and good swimming conditions.,Beaches,6.1370,80.2275
+Kahandamodara Beach,Kahandamodara,Southern,"A rural beach where the Walawe River meets the ocean, offering unique landscapes.",Beaches,5.9963,80.1319
+Batticaloa Beach,Batticaloa,Eastern,"A beach near the famous 'singing fish' lagoon, with cultural significance.",Beaches,7.7234,81.6944
+Pigeon Island Beach,Nilaveli,Eastern,A small beach on a protected marine national park with excellent snorkeling.,Beaches,7.9726,81.5008
+Jungle Beach,Unawatuna,Southern,A secluded beach accessible by a short trek through jungle terrain.,Beaches,6.0169,80.2496
+Sigiriya Rock Fortress,Sigiriya,Central,"An ancient rock fortress with frescoes and water gardens, built by King Kashyapa in the 5th century.",Cultural/Heritage Sites,7.9573,80.7505
+Polonnaruwa Ancient City,Polonnaruwa,North Central,"Medieval capital with well-preserved stupas, temples, and statues from the 12th century.",Cultural/Heritage Sites,7.9403,81.0188
+Anuradhapura Sacred City,Anuradhapura,North Central,"Sri Lanka's first capital with ancient dagobas, temples, and the sacred Sri Maha Bodhi tree.",Cultural/Heritage Sites,8.3114,80.4037
+Galle Fort,Galle,Southern,A UNESCO World Heritage site with Dutch colonial architecture and rampart walls.,Cultural/Heritage Sites,6.0535,80.2210
+Kandy Sacred City,Kandy,Central,"The last capital of ancient kings, home to the Temple of the Tooth and Kandy Lake.",Cultural/Heritage Sites,7.2906,80.6337
+Dambulla Cave Temple,Dambulla,Central,A UNESCO site featuring five caves with over 150 Buddha statues and ancient murals.,Cultural/Heritage Sites,7.8729,80.6510
+Yapahuwa Rock Fortress,Yapahuwa,North Western,"A 13th-century fortress built on a 90-meter rock, featuring ornate stone stairways.",Cultural/Heritage Sites,7.6421,79.9054
+Mihintale,Mihintale,North Central,"Considered the birthplace of Buddhism in Sri Lanka, with ancient stupas and rock dwellings.",Cultural/Heritage Sites,8.3668,80.6029
+Aluvihara Rock Temple,Matale,Central,Ancient rock temple where the Buddhist scriptures were first written down.,Cultural/Heritage Sites,7.1408,80.5193
+Ritigala Ancient Monastery,Ritigala,North Central,Mysterious forest monastery ruins with sophisticated hydraulic systems and stone bridges.,Cultural/Heritage Sites,8.4896,80.5288
+Pidurangala Rock,Sigiriya,Central,"Ancient rock temple with panoramic views of Sigiriya Rock, popular for sunrise hikes.",Cultural/Heritage Sites,7.9573,80.7505
+Buduruwagala,Wellawaya,Uva,"The tallest standing Buddha statue from the 10th century, carved into a rock face.",Cultural/Heritage Sites,6.7273,81.2497
+Koneswaram Temple,Trincomalee,Eastern,Ancient Hindu sea temple perched on Swami Rock cliff with panoramic ocean views.,Cultural/Heritage Sites,8.5922,81.2016
+Embekka Devalaya,Kandy,Central,Famous for its intricate wooden pillars with elaborate carvings from the 14th century.,Cultural/Heritage Sites,7.2906,80.6337
+Avukana Buddha Statue,Kekirawa,North Central,12-meter standing Buddha statue carved from a single rock in the 5th century.,Cultural/Heritage Sites,8.5192,80.4957
+Medirigiriya Vatadage,Medirigiriya,North Central,Circular relic house with stone pillars and carvings from the 7th century.,Cultural/Heritage Sites,8.4339,80.3372
+Lankatilaka Temple,Kandy,Central,14th-century temple with impressive Kandyan architecture and panoramic views.,Cultural/Heritage Sites,7.2906,80.6337
+Jetavanaramaya,Anuradhapura,North Central,"One of the tallest stupas of the ancient world at 122 meters, built in the 3rd century.",Cultural/Heritage Sites,8.3114,80.4037
+Thuparamaya,Anuradhapura,North Central,The first stupa built in Sri Lanka after the introduction of Buddhism.,Cultural/Heritage Sites,8.3114,80.4037
+Isurumuniya,Anuradhapura,North Central,Rock temple known for its stone carvings including the famous 'Lovers' sculpture.,Cultural/Heritage Sites,8.3114,80.4037
+Kuttam Pokuna,Anuradhapura,North Central,Twin ponds with sophisticated hydraulic filtering system from the ancient period.,Cultural/Heritage Sites,8.3114,80.4037
+Ruwanwelisaya,Anuradhapura,North Central,Massive white stupa built by King Dutugemunu in the 2nd century BCE.,Cultural/Heritage Sites,8.3114,80.4037
+Abhayagiri Monastery,Anuradhapura,North Central,"Ancient Buddhist monastery that once housed 5,000 monks and complex buildings.",Cultural/Heritage Sites,8.3114,80.4037
+Nalanda Gedige,Matale,Central,Unique stone temple showing both Hindu and Buddhist architectural influences.,Cultural/Heritage Sites,7.4315,80.8217
+Lovamahapaya,Anuradhapura,North Central,"Ancient multi-storied palace with 1,600 stone pillars, also called Brazen Palace.",Cultural/Heritage Sites,8.3114,80.4037
+Fa Hien Cave,Kalutara,Western,"One of the largest prehistoric caves in Asia with evidence of 37,000-year-old human habitation.",Cultural/Heritage Sites,6.9752,79.9806
+Mulkirigala Rock Temple,Mulkirigala,Southern,"Ancient rock temple complex with painted caves, stupas, and Buddha statues on a 205m rock.",Cultural/Heritage Sites,5.8714,80.3460
+Katuwana Fort,Katuwana,Southern,"A Dutch-era inland fort built in the 17th century, the only remaining inland fort.",Cultural/Heritage Sites,5.9577,80.2636
+Magul Maha Viharaya,Lahugala,Eastern,15th-century temple with elaborate stone carvings celebrating a royal wedding.,Cultural/Heritage Sites,7.9736,81.4812
+Yatala Vehera,Tissamaharama,Southern,Ancient stupa built by King Mahanaga in the 3rd century BCE.,Cultural/Heritage Sites,6.1692,80.3871
+Sri Dalada Maligawa (Temple of the Tooth),Kandy,Central,Sacred Buddhist temple housing Buddha's tooth relic in a golden casket.,Temples,7.2906,80.6337
+Kelaniya Raja Maha Viharaya,Kelaniya,Western,"Ancient temple believed to have been visited by Buddha, with important murals and sculptures.",Temples,6.8468,79.7939
+Gangaramaya Temple,Colombo,Western,"Eclectic temple complex with a mix of Sri Lankan, Thai, Indian, and Chinese architecture.",Temples,6.9271,79.8612
+Dambulla Cave Temple,Dambulla,Central,"Rock cave complex with 153 Buddha statues, 4 statues of gods and kings, and numerous paintings.",Temples,7.8729,80.6510
+Maha Vishnu Devalaya,Kandy,Central,One of the four guardian deities of Sri Lanka dedicated to god Vishnu.,Temples,7.2906,80.6337
+Kataragama Temple,Kataragama,Uva,"Sacred complex visited by Buddhists, Hindus, Muslims, and indigenous Vedda people.",Temples,6.8546,81.3042
+Saman Devalaya,Ratnapura,Sabaragamuwa,"Temple dedicated to deity Saman, the guardian of Sri Pada (Adam's Peak).",Temples,6.6933,80.2273
+Natha Devalaya,Kandy,Central,One of the oldest structures in Kandy dedicated to deity Natha.,Temples,7.2906,80.6337
+Gadaladeniya Temple,Kandy,Central,14th-century temple with South Indian architectural influences built on a rock.,Temples,7.2906,80.6337
+Lankathilaka Temple,Kandy,Central,Impressive temple with white outer walls and intricate interior paintings.,Temples,7.2906,80.6337
+Wewurukannala Viharaya,Dickwella,Southern,"Temple known for its 50m-tall seated Buddha statue, one of the tallest in Sri Lanka.",Temples,6.2444,80.0335
+Muthiyangana Raja Maha Viharaya,Badulla,Uva,One of the 16 places believed to have been visited by Buddha in Sri Lanka.,Temples,6.9640,81.5453
+Bellanwila Rajamaha Viharaya,Colombo,Western,"Temple known for its sacred Bodhi tree, believed to be from the original Sri Maha Bodhi.",Temples,6.9271,79.8612
+Seruwila Mangala Raja Maha Viharaya,Trincomalee,Eastern,One of the 16 main places of worship (Solosmasthana) in Sri Lanka.,Temples,8.5922,81.2016
+Nagadeepa Purana Viharaya,Jaffna,Northern,Ancient temple on Nainativu Island believed to have been visited by Buddha.,Temples,9.6615,80.0255
+Ruhunu Maha Kataragama Devalaya,Kataragama,Uva,"Temple complex dedicated to deity Kataragama, important pilgrimage site.",Temples,6.9447,81.4671
+Munneswaram Temple,Chilaw,North Western,Ancient Hindu temple complex dating back to 1000 CE dedicated to Lord Shiva.,Temples,7.7085,79.8411
+Nallur Kandaswamy Temple,Jaffna,Northern,"One of the most important Hindu temples in the country, dedicated to Lord Murugan.",Temples,9.6615,80.0255
+Thirukoneswaram Temple,Trincomalee,Eastern,Ancient Hindu cliff-top temple with panoramic views of the Indian Ocean.,Temples,8.5922,81.2016
+Maha Bodhi Temple,Anuradhapura,North Central,"Temple built around the sacred Sri Maha Bodhi tree, oldest historically documented tree.",Temples,8.3114,80.4037
+Situlpawwa Ancient Buddhist Monastery,Yala,Southern,2nd-century rock temple inside Yala National Park with ancient statues and stupas.,Temples,6.3666,81.5167
+Mirisavatiya Stupa,Anuradhapura,North Central,Stupa built by King Dutugemunu after achieving victory over King Elara.,Temples,8.3114,80.4037
+Sathmahal Prasada,Polonnaruwa,North Central,Unique seven-story pyramid-shaped building with unclear origins and purpose.,Temples,7.9403,81.0188
+Ridee Viharaya,Kurunegala,North Western,"Temple known for silver ore found in the area, with ancient paintings and artifacts.",Temples,7.6322,80.1209
+Somawathie Chaitya,Polonnaruwa,North Central,"Stupa containing the right tooth relic of the Buddha, located within wildlife sanctuary.",Temples,7.9403,81.0188
+Tissa Maha Viharaya,Kalutara,Western,Ancient temple with a 6-meter reclining Buddha statue and colorful paintings.,Temples,7.1040,80.0500
+Digamadulla Maha Viharaya,Ampara,Eastern,Ancient temple complex with historical significance in the eastern province.,Temples,7.7944,81.8037
+Girihadu Seya,Trincomalee,Eastern,Believed to be the first stupa built in Sri Lanka containing hair relics of Buddha.,Temples,8.5922,81.2016
+Sangamitta Viharaya,Galle,Southern,Temple dedicated to Sangamitta Theri who brought the Bodhi tree sapling to Sri Lanka.,Temples,6.0535,80.2210
+Rambukkana Maligatenna Temple,Rambukkana,Sabaragamuwa,Rock temple with ancient cave paintings and inscriptions.,Temples,6.6764,80.2415
+Yala National Park,Hambantota,Southern,"Sri Lanka's most visited park, famous for leopards, elephants, and sloth bears.",Wildlife/National Parks,6.1362,80.3212
+Udawalawe National Park,Udawalawe,Sabaragamuwa,Known for large elephant herds and the Elephant Transit Home for orphaned calves.,Wildlife/National Parks,6.7393,80.3537
+Wilpattu National Park,Puttalam,North Western,The largest national park with natural lakes called 'villus' and diverse wildlife.,Wildlife/National Parks,7.7188,80.0394
+Horton Plains National Park,Nuwara Eliya,Central,"Misty highland plateau with unique vegetation, sambar deer, and the famous World's End cliff.",Wildlife/National Parks,6.9497,80.7891
+Minneriya National Park,Minneriya,North Central,"Famous for 'The Gathering,' where hundreds of elephants congregate around the ancient tank.",Wildlife/National Parks,8.2976,80.6229
+Bundala National Park,Hambantota,Southern,"Coastal wetland with flamingos and migratory birds, designated as a Ramsar site.",Wildlife/National Parks,5.9557,80.1247
+Wasgamuwa National Park,Matale,Central,Secluded park known for herds of elephants and ancient irrigation tanks.,Wildlife/National Parks,7.4490,80.7197
+Gal Oya National Park,Ampara,Eastern,Sri Lanka's only national park where you can safari by boat on Senanayake Samudra reservoir.,Wildlife/National Parks,7.6303,81.7854
+Kumana National Park,Ampara,Eastern,Bird sanctuary with mangrove swamps and important nesting site for waterfowl.,Wildlife/National Parks,7.6055,81.7077
+Maduru Oya National Park,Ampara,Eastern,Protected area with ancient irrigation tanks and elephant herds.,Wildlife/National Parks,7.6070,81.6902
+Kaudulla National Park,Kaudulla,North Central,Important elephant corridor connecting Minneriya and Wasgamuwa parks.,Wildlife/National Parks,8.2467,80.4026
+Lahugala Kitulana National Park,Ampara,Eastern,Small park known for elephants who feed on beru grass near the Lahugala tank.,Wildlife/National Parks,7.6168,81.5666
+Lunugamvehera National Park,Hambantota,Southern,"Wildlife corridor connecting Yala and Udawalawe, with diverse mammal species.",Wildlife/National Parks,5.9474,80.3451
+Flood Plains National Park,Polonnaruwa,North Central,Lowland floodplain around Mahaweli River with unique freshwater fish species.,Wildlife/National Parks,7.9403,81.0188
+Horagolla National Park,Gampaha,Western,Small park protecting endemic plants and the Dipterocarpus zeylanicus tree.,Wildlife/National Parks,6.9193,80.0185
+Pigeon Island National Park,Trincomalee,Eastern,"Marine national park with coral reefs, tropical fish, and nesting rock pigeons.",Wildlife/National Parks,8.5922,81.2016
+Hikkaduwa Marine National Park,Hikkaduwa,Southern,Protected coral sanctuary with colorful reef fish and sea turtles.,Wildlife/National Parks,6.1395,80.1063
+Bar Reef Marine Sanctuary,Kalpitiya,North Western,Sri Lanka's largest coral reef with over 150 species of coral and 283 fish species.,Wildlife/National Parks,7.7870,79.8711
+Angammedilla National Park,Polonnaruwa,North Central,Important elephant habitat and watershed protecting the ancient Parakrama Samudra tank.,Wildlife/National Parks,7.9403,81.0188
+Somawathie Chaitya National Park,Polonnaruwa,North Central,Created to protect the Somawathie sacred temple and surrounding wildlife.,Wildlife/National Parks,7.9403,81.0188
+Galway's Land National Park,Nuwara Eliya,Central,Small montane forest reserve with endemic birds and highland vegetation.,Wildlife/National Parks,6.9497,80.7891
+Chundikkulam National Park,Jaffna,Northern,Coastal park with lagoon ecosystem important for migratory waterbirds.,Wildlife/National Parks,9.6615,80.0255
+Delft Island National Park,Jaffna,Northern,"Island sanctuary protecting feral horses, coral gardens, and migratory birds.",Wildlife/National Parks,9.6615,80.0255
+Victoria-Randenigala-Rantambe Sanctuary,Kandy,Central,Protected forests around three reservoirs created by dams on the Mahaweli River.,Wildlife/National Parks,7.2906,80.6337
+Jaffna Bird Sanctuary,Jaffna,Northern,Wetlands protecting migratory birds with an integrated waterscape.,Wildlife/National Parks,9.6615,80.0255
+Peak Wilderness Sanctuary,Nuwara Eliya,Central,Mountainous forest surrounding Sri Pada (Adam's Peak) with high biodiversity.,Wildlife/National Parks,6.9497,80.7891
+Hakgala Strict Nature Reserve,Nuwara Eliya,Central,High-altitude forest with rare montane vegetation and endemic species.,Wildlife/National Parks,6.9497,80.7891
+Knuckles Mountain Range,Matale,Central,Isolated mountain range with spectacular landscapes and unique biodiversity.,Wildlife/National Parks,7.4788,80.8215
+Sinharaja Forest Reserve,Ratnapura,Sabaragamuwa,UNESCO World Heritage site and virgin rainforest with high endemism.,Wildlife/National Parks,6.5323,80.5329
+Kotagala Tea Plantation,Nuwara Eliya,Central,Historic tea estate offering tours of the factory process and tastings.,Tea Plantations,6.9497,80.7891
+Mackwoods Tea Estate,Nuwara Eliya,Central,"Established in 1841 with a tea museum, factory tours, and panoramic views.",Tea Plantations,6.9497,80.7891
+Pedro Tea Estate,Nuwara Eliya,Central,One of the highest elevated tea factories offering educational tours and tastings.,Tea Plantations,6.9497,80.7891
+Dambatenne Tea Factory,Haputale,Uva,Built by Sir Thomas Lipton with tours and access to famous Lipton's Seat viewpoint.,Tea Plantations,6.8264,81.5136
+Glenloch Tea Factory,Katukitula,Central,Scenic tea estate with factory tours explaining the Orthodox tea making process.,Tea Plantations,7.4832,80.5561
+Blue Field Tea Factory,Ramboda,Central,Factory and museum with views of the Ramboda Falls and Puna Valley.,Tea Plantations,7.4871,80.5505
+Labookellie Tea Estate,Nuwara Eliya,Central,Historic tea factory with guided tours and tea tasting overlooking lush plantations.,Tea Plantations,6.9497,80.7891
+Damro Tea Lounge,Hatton,Central,Large tea plantation with modern visitor center and restaurant with panoramic views.,Tea Plantations,7.4605,80.5796
+Uva Halpewatte Tea Factory,Ella,Uva,Largest tea factory in the Uva region with comprehensive tours of the production.,Tea Plantations,6.8667,81.0466
+Handunugoda Tea Estate,Galle,Southern,Unique low-country tea plantation producing the famous 'Virgin White Tea'.,Tea Plantations,6.0535,80.2210
+St. Clair's Falls Tea Estate,Talawakele,Central,Tea plantation surrounding the 'Little Niagara of Sri Lanka' waterfall.,Tea Plantations,7.4104,80.7861
+Loolkandura Estate,Deltota,Central,"The first tea plantation established by James Taylor in 1867, the birthplace of Ceylon Tea.",Tea Plantations,7.3730,80.6694
+Nuwara Eliya Golf Club Tea Plantation,Nuwara Eliya,Central,"Historic estate surrounding the colonial-era golf course at 6,000 feet elevation.",Tea Plantations,6.9497,80.7891
+Pattiyagama Tea Factory,Deniyaya,Southern,Tea factory at the edge of Sinharaja rainforest producing low-grown varieties.,Tea Plantations,6.1150,80.1060
+Halpe Tea Factory,Ella,Uva,Family-owned estate offering a more intimate tour experience of tea production.,Tea Plantations,6.8667,81.0466
+Kandapola Tea Factory,Kandapola,Central,High-altitude tea plantation with traditional production methods and mountain views.,Tea Plantations,7.1546,80.6730
+Bogawantalawa Tea Estate,Bogawantalawa,Central,Part of the 'Golden Valley of Tea' with scenic landscapes and colonial bungalows.,Tea Plantations,7.1915,80.7793
+Nayabedda Tea Factory,Bandarawela,Uva,Historic factory with traditional equipment and spectacular Haputale views.,Tea Plantations,6.8065,81.3161
+Idalgashinna Tea Factory,Haputale,Uva,Remote tea factory along the scenic train route with high-quality Uva teas.,Tea Plantations,6.9694,81.3805
+Finlays Tea Estate,Koslanda,Uva,British-era plantation with traditional production and sustainable practices.,Tea Plantations,6.9644,81.2533
+Hapugasthenna Tea Plantation,Maskeliya,Central,High-altitude plantation on the way to Adam's Peak with diverse tea varieties.,Tea Plantations,7.2281,80.6989
+Norwood Tea Factory,Norwood,Central,Heritage factory with panoramic views of the surrounding plantations and reservoirs.,Tea Plantations,7.2721,80.4474
+Strathdon Tea Factory,Hatton,Central,Century-old tea factory with traditional methods and tasting center.,Tea Plantations,7.2620,80.7485
+New Vithanakande Tea Factory,Ratnapura,Sabaragamuwa,Award-winning plantation producing some of the world's most expensive teas.,Tea Plantations,6.5886,80.4276
+Mlesna Tea Castle,Bandarawela,Uva,Unique castle-like tea center with factory tours and extensive tea shop.,Tea Plantations,6.7608,81.4200
+Lovers Leap Tea Estate,Nuwara Eliya,Central,"Named after the waterfall and legend, offering stunning valley views.",Tea Plantations,6.9497,80.7891
+Mattakelle Tea Factory,Talawakele,Central,Historic plantation known for high-quality high-grown teas and biodiversity.,Tea Plantations,7.2553,80.4981
+Kadugannawa Tea Garden,Kadugannawa,Central,Roadside plantation near the historic Kadugannawa Pass with visitor facilities.,Tea Plantations,7.1157,80.4767
+Great Western Estate,Talawakele,Central,One of the oldest estates in Sri Lanka with colonial heritage buildings.,Tea Plantations,7.1691,80.5963
+Galle Fort,Galle,Southern,"UNESCO site with Dutch colonial architecture, rampart walls, and cobblestone streets.",Colonial Towns,6.0535,80.2210
+Colombo Fort,Colombo,Western,"Historic district with British, Dutch and Portuguese colonial architecture and modern additions.",Colonial Towns,6.9271,79.8612
+Nuwara Eliya Town,Nuwara Eliya,Central,"'Little England' with Tudor-style buildings, colonial cottages, and a cool climate.",Colonial Towns,6.9497,80.7891
+Matara Fort,Matara,Southern,"Dutch fort with ramparts, colonial buildings, and a star-shaped fortress.",Colonial Towns,5.9549,80.5550
+Jaffna Town,Jaffna,Northern,City with Dutch and Portuguese influences seen in colonial buildings and fort ruins.,Colonial Towns,9.6615,80.0255
+Batticaloa Town,Batticaloa,Eastern,"Coastal town with Dutch fort, colonial churches, and a unique singing fish phenomenon.",Colonial Towns,7.9133,81.6537
+Trincomalee Town,Trincomalee,Eastern,"Strategic harbor town with colonial architecture from Portuguese, Dutch and British periods.",Colonial Towns,8.5922,81.2016
+Mannar Town,Mannar,Northern,Island town with Doric columns of the Dutch Fort and colonial-era administrative buildings.,Colonial Towns,9.8037,79.9650
+Kalpitiya Fort,Kalpitiya,North Western,"Dutch fort built in 1676 for the spice trade, with thick walls and a strategic location.",Colonial Towns,7.6530,80.0344
+Hammenhiel Fort,Jaffna,Northern,Unique Dutch fort built on a small island between Kayts and Karaitivu islands.,Colonial Towns,9.6615,80.0255
+Tangalle Town,Tangalle,Southern,Coastal colonial town with Dutch and British architectural influences.,Colonial Towns,6.1041,80.1833
+Puttalam Town,Puttalam,North Western,Trading port with colonial structures from the Dutch and Portuguese periods.,Colonial Towns,7.6978,80.1368
+Negombo Town,Negombo,Western,"Known as 'Little Rome' with Dutch canals, Portuguese and Dutch architecture.",Colonial Towns,7.2008,79.8737
+Chettinad,Jaffna,Northern,District with unique colonial and Chettiar architecture influenced by trade wealth.,Colonial Towns,9.6615,80.0255
+Haputale Town,Haputale,Uva,Hill station with British colonial architecture and tea plantation heritage.,Colonial Towns,6.8180,81.3444
+Hatton Town,Hatton,Central,Railway town developed during British rule with colonial administrative buildings.,Colonial Towns,7.1149,80.8019
+Badulla Town,Badulla,Uva,End of the colonial railway line with British administrative buildings and churches.,Colonial Towns,6.8730,81.1744
+Point Pedro Town,Point Pedro,Northern,Northernmost town with Dutch and Portuguese colonial remnants and lighthouse.,Colonial Towns,9.7716,79.9154
+Kalutara Town,Kalutara,Western,River mouth settlement with British and Dutch influences and the Kalutara Bridge.,Colonial Towns,6.7438,80.0576
+Panadura Town,Panadura,Western,Coastal town with colonial churches and the historic site of the great Buddhist debate.,Colonial Towns,6.8236,79.7388
+National Museum of Colombo,Colombo,Western,Sri Lanka's largest museum with artifacts spanning prehistory to the colonial era.,Museums,6.9271,79.8612
+Galle National Museum,Galle,Southern,Located in the oldest Dutch building in Galle Fort with maritime and cultural artifacts.,Museums,6.0535,80.2210
+Kandy National Museum,Kandy,Central,Former royal palace with artifacts from the ancient Kandyan Kingdom.,Museums,7.2906,80.6337
+Maritime Museum,Galle,Southern,Located in the Dutch warehouse of the Galle Fort with maritime artifacts and maps.,Museums,6.0535,80.2210
+Folk Museum,Anuradhapura,North Central,"Collection of traditional tools, pottery, and folk objects from rural Sri Lanka.",Museums,8.3114,80.4037
+Independence Memorial Museum,Colombo,Western,Modern museum dedicated to Sri Lanka's independence movement and leaders.,Museums,6.9271,79.8612
+Martin Wickramasinghe Folk Museum,Koggala,Southern,Writer's ancestral home with traditional rural lifestyle artifacts.,Museums,5.8724,80.0685
+National Railway Museum,Colombo,Western,"Collection of historic locomotives, carriages, and railway memorabilia.",Museums,6.9271,79.8612
+Central Cultural Fund Museum,Polonnaruwa,North Central,Archaeological museum with artifacts from the ancient city of Polonnaruwa.,Museums,7.9403,81.0188
+Sigiriya Museum,Sigiriya,Central,"Modern facility with artifacts, information, and a model of the Sigiriya rock palace.",Museums,7.9573,80.7505
+Anuradhapura Archaeological Museum,Anuradhapura,North Central,Collection of religious and civic artifacts from ancient Anuradhapura.,Museums,8.3114,80.4037
+World Buddhist Museum,Kandy,Central,International Buddhist artifacts housed in the former royal court building.,Museums,7.2906,80.6337
+Traditional Mask Museum,Ambalangoda,Southern,Collection of ceremonial masks with demonstrations of traditional mask making.,Museums,5.9967,80.1268
+Ceylon Tea Museum,Kandy,Central,Located in the former Hantane Tea Factory with tea production equipment and history.,Museums,7.2906,80.6337
+Gem Museum,Ratnapura,Sabaragamuwa,Educational museum about Sri Lanka's gemstone industry with mining exhibits.,Museums,6.7817,80.3722
+Dutch Period Museum,Colombo,Western,"Colonial-era house with furniture, coins, and artifacts from the Dutch period.",Museums,6.9271,79.8612
+DFCC Museum,Jaffna,Northern,Archaeological museum with artifacts from the Jaffna region and Northern Province.,Museums,9.6615,80.0255
+Tsunami Photo Museum,Telwatta,Southern,Community museum documenting the 2004 tsunami's impact on coastal communities.,Museums,6.2440,80.1694
+Dambulla Museum,Dambulla,Central,Archaeological museum with artifacts from the area's caves and ancient sites.,Museums,7.8729,80.6510
+Natural History Museum,Colombo,Western,"Collection of Sri Lanka's fauna, flora, geology, and anthropology exhibits.",Museums,6.9271,79.8612
+Ethnological Museum,Kandy,Central,Collection focusing on Sri Lanka's diverse ethnic communities and cultures.,Museums,7.2906,80.6337
+Royal Asiatic Society Museum,Colombo,Western,Small museum with historical manuscripts and colonial-era memorabilia.,Museums,6.9271,79.8612
+Government Survey Museum,Colombo,Western,"Collection of surveying equipment, maps, and geographical information.",Museums,6.9271,79.8612
+Diyawanna Archaeology Museum,Colombo,Western,Modern museum featuring artifacts from excavations around the Western Province.,Museums,6.9271,79.8612
+Ella Rock,Ella,Uva,Iconic mountain offering panoramic views after a moderate hike through tea plantations.,Natural Attractions,6.8667,81.0466
+World's End,Nuwara Eliya,Central,"Sheer cliff with an 870m drop at Horton Plains National Park, offering stunning views.",Natural Attractions,6.9497,80.7891
+Bambarakanda Falls,Kalupahana,Uva,"Sri Lanka's highest waterfall at 263m, located near Haputale.",Natural Attractions,7.0938,81.4905
+Diyaluma Falls,Koslanda,Uva,Second highest waterfall in Sri Lanka with natural swimming pools at different levels.,Natural Attractions,6.9112,81.1667
+Ravana Falls,Ella,Uva,"Popular waterfall linked to the Ramayana legend, easily accessible from the road.",Natural Attractions,6.8667,81.0466
+Baker's Falls,Nuwara Eliya,Central,Picturesque waterfall in Horton Plains National Park named after British explorer.,Natural Attractions,6.9497,80.7891
+Dunhinda Falls,Badulla,Uva,30m waterfall known as the 'smoky mountain falls' due to the spray it creates.,Natural Attractions,6.8239,81.2939
+Sinharaja Forest Reserve,Deniyaya,Sabaragamuwa,UNESCO World Heritage rainforest with high biodiversity and endemic species.,Natural Attractions,6.5517,80.2780
+Little Adam's Peak,Ella,Uva,"Easy hiking mountain with panoramic views, named for its resemblance to the larger peak.",Natural Attractions,6.8667,81.0466
+Sri Pada (Adam's Peak),Ratnapura,Sabaragamuwa,Sacred mountain with a footprint-shaped depression revered by multiple religions.,Natural Attractions,6.8361,80.3909
+Knuckles Mountain Range,Matale,Central,Misty mountains resembling knuckles with diverse microclimates and hiking trails.,Natural Attractions,7.4748,80.6447
+Pidurutalagala,Nuwara Eliya,Central,"Sri Lanka's highest mountain at 2,524m with a telecommunications complex on top.",Natural Attractions,6.9497,80.7891
+Riverston,Matale,Central,Off-the-beaten-path mountain area with 'mini world's end' views and hiking trails.,Natural Attractions,7.3768,80.4665
+St. Clair's Falls,Talawakele,Central,Widest waterfall in Sri Lanka known as the 'Little Niagara' with twin falls.,Natural Attractions,7.3902,80.5688
+Devon Falls,Hatton,Central,"A picturesque waterfall visible from the Hatton-Nuwara Eliya road, named after a English pioneer.",Natural Attractions,7.3118,80.7458
+Bopath Ella Falls,Kuruwita,Sabaragamuwa,Waterfall shaped like a Bo leaf (sacred fig) with a 30m drop.,Natural Attractions,6.7175,80.5751
+Maha Eliya Plains,Nuwara Eliya,Central,High-altitude grasslands with rare montane vegetation and mist-covered landscapes.,Natural Attractions,6.9497,80.7891
+Kirigalpotta,Nuwara Eliya,Central,"Second highest mountain in Sri Lanka at 2,395m with challenging hiking trails.",Natural Attractions,6.9497,80.7891
+Totupola Kanda,Nuwara Eliya,Central,Third highest mountain in Sri Lanka located within Horton Plains National Park.,Natural Attractions,6.9497,80.7891
+Ramboda Falls,Pussellawa,Central,"Three-tiered waterfall with a total height of 109m, visible from the main road.",Natural Attractions,7.2952,80.5218
+Bomburu Ella Falls,Welimada,Uva,Collection of 500 small waterfalls forming a stunning cascade during rainy season.,Natural Attractions,6.8618,81.3066
+Lovers Leap Falls,Nuwara Eliya,Central,"30m waterfall named after a tragic legend, located near the Nuwara Eliya town.",Natural Attractions,6.9497,80.7891
+Duwili Ella (Mist Falls),Badulla,Uva,Remote waterfall that completely vaporizes before hitting the ground during dry season.,Natural Attractions,6.7118,81.4737
+Bakers Farm Hill,Bandarawela,Uva,Tea-covered hillside with panoramic views of the Badulla valley.,Natural Attractions,7.0894,81.3399
+Lipton's Seat,Haputale,Uva,Panoramic viewpoint where Sir Thomas Lipton used to survey his tea empire.,Natural Attractions,6.9132,81.2474
+Ambuluwawa Tower,Gampola,Central,Unique multi-religious tower on a biodiversity complex with 360-degree views.,Natural Attractions,7.2883,80.5176
+Pitawala Pathana,Matale,Central,Unique flat grassland plateau in the Knuckles Range with endemic flora.,Natural Attractions,7.1760,80.8286
+Lakegala Mountain,Meemure,Central,Challenging pyramid-shaped peak in the remote Knuckles wilderness area.,Natural Attractions,7.1167,80.6170
+Hunnas Falls,Elkaduwa,Central,Series of cascades surrounded by tea plantations in the Knuckles foothills.,Natural Attractions,7.4214,80.7517
+Nuwara Eliya,Nuwara Eliya,Central,"Sri Lanka's highest town with colonial architecture, cool climate, and flower gardens.",Hill Stations,6.9497,80.7891
+Ella,Ella,Uva,Popular mountain village with views of Ella Gap and access to hiking trails.,Hill Stations,6.8667,81.0466
+Haputale,Haputale,Uva,Misty mountain town on a steep ridge with panoramic views and tea plantations.,Hill Stations,6.9170,81.4781
+Bandarawela,Bandarawela,Uva,"Pleasant hill country town with mild climate, popular for retirement and relaxation.",Hill Stations,6.8674,81.3269
+Hatton,Hatton,Central,Central hub of Sri Lanka's tea country with colonial heritage and plantation access.,Hill Stations,7.4438,80.5701
+Kandy,Kandy,Central,Historic last royal capital in the hills surrounding a scenic lake and sacred sites.,Hill Stations,7.2906,80.6337
+Matale,Matale,Central,Gateway hill town to the Knuckles Mountain Range with spice gardens and temples.,Hill Stations,7.4822,80.7577
+Badulla,Badulla,Uva,End point of the scenic hill country railway with colonial buildings and waterfalls.,Hill Stations,7.0848,81.3819
+Pussellawa,Pussellawa,Central,Small hillside town surrounded by tea estates on the road to Nuwara Eliya.,Hill Stations,7.4389,80.5684
+Dickoya,Dickoya,Central,Tranquil hill station with colonial bungalows and the scenic Castlereagh Reservoir.,Hill Stations,7.3784,80.6214
+Maskeliya,Maskeliya,Central,Hill town serving as a base for climbing Adam's Peak with stunning reservoir views.,Hill Stations,7.3602,80.6771
+Hali-Ela,Hali-Ela,Uva,Junction town in the cool highlands with railway heritage and natural attractions.,Hill Stations,6.9728,81.4594
+Ambewela,Ambewela,Central,Known as 'Little New Zealand' for its dairy farms and rolling green pastures.,Hill Stations,7.2153,80.6516
+Ohiya,Ohiya,Uva,Remote hill station with the highest railway station in Sri Lanka and misty forests.,Hill Stations,6.7950,81.4165
+Welimada,Welimada,Uva,Agricultural hill town in a valley surrounded by vegetable farms and mountains.,Hill Stations,6.9968,81.4880
+Koslanda,Koslanda,Uva,Quiet hill village with access to Diyaluma Falls and ancient forest monasteries.,Hill Stations,6.7258,81.4573
+Deltota,Deltota,Central,Tea plantation town where James Taylor first planted commercial tea in Sri Lanka.,Hill Stations,7.4592,80.5585
+Madulsima,Madulsima,Uva,Remote tea plantation area with stunning views and minimal tourist development.,Hill Stations,7.0246,81.5080
+Diyatalawa,Diyatalawa,Uva,"Military town with a cool climate, popular for training and recreation.",Hill Stations,7.0693,81.4528
+Patana,Haputale,Uva,Small settlement with vast grasslands (patanas) and panoramic mountain views.,Hill Stations,6.7336,81.3015
+Haldummulla,Haldummulla,Uva,Hill country junction town on the old Colombo-Badulla main road with colonial history.,Hill Stations,6.8101,81.3502
+Idalgashinna,Idalgashinna,Uva,Remote mountain pass with the third highest railway station and spectacular views.,Hill Stations,6.9903,81.1679
+Royal Botanical Gardens,Peradeniya,Central,"Sri Lanka's largest botanical garden with over 4,000 plant species and giant Java fig avenue.",Gardens,7.2710,80.7577
+Hakgala Botanical Gardens,Nuwara Eliya,Central,"Second largest gardens in Sri Lanka with roses, orchids, and fernery at high elevation.",Gardens,6.9497,80.7891
+Henarathgoda Botanical Garden,Gampaha,Western,Historic garden where the first rubber trees in Asia were successfully cultivated.,Gardens,7.0505,79.7102
+Gampaha Botanical Garden,Gampaha,Western,Medicinal plant garden with hundreds of species used in traditional Ayurvedic medicine.,Gardens,6.9734,79.9419
+Dry Zone Botanical Gardens,Hambantota,Southern,Specialized garden showcasing plants adapted to Sri Lanka's dry climate regions.,Gardens,6.0272,80.2383
+Mirijjawila Botanical Garden,Hambantota,Southern,Newest botanical garden focused on dry and arid zone flora with butterfly garden.,Gardens,6.0374,80.4177
+Seethawaka Wet Zone Botanical Garden,Avissawella,Western,Garden preserving threatened plants of Sri Lanka's wet zone rainforests.,Gardens,6.7750,79.7451
+Dambulla Dedicated Economic Centre Garden,Dambulla,Central,Commercial plants and vegetable demonstration garden at agricultural trading hub.,Gardens,7.8729,80.6510
+Matale Spice Garden,Matale,Central,"Educational garden showcasing cinnamon, cardamom, pepper and other spice plants.",Gardens,7.3833,80.5354
+Euphoria Spice and Herbal Garden,Matale,Central,Traditional spice garden with medicinal plants and processing demonstrations.,Gardens,7.1272,80.5762
+New Colonial Spice Garden,Kandy,Central,Interactive spice garden with culinary demonstrations and traditional medicine displays.,Gardens,7.2906,80.6337
+Lunuganga Estate Gardens,Bentota,Southern,Geoffrey Bawa's personal garden estate with architectural landscaping features.,Gardens,6.4213,79.9989
+Brief Garden,Bentota,Southern,"Bevis Bawa's fantastical garden with sculptures, ponds, and artistic landscape design.",Gardens,6.4213,79.9989
+Lady Horton's Walk,Kandy,Central,Historic hillside garden with walking paths and panoramic views of Kandy.,Gardens,7.2906,80.6337
+Victoria Park,Nuwara Eliya,Central,Colonial-era public garden with seasonal flower displays and manicured lawns.,Gardens,6.9497,80.7891
+Viharamahadevi Park,Colombo,Western,"Colombo's largest public park with flowering trees, water features, and play areas.",Gardens,6.9271,79.8612
+Japanese Peace Pagoda Garden,Unawatuna,Southern,Zen-influenced garden surrounding the hilltop white pagoda with coastal views.,Gardens,6.0169,80.2496
+Katuwana Herbal Garden,Katuwana,Southern,Educational center for indigenous medicinal plants used in traditional healing.,Gardens,5.9914,80.0969
+Lotus Tower Garden,Colombo,Western,Modern landscaped garden surrounding Sri Lanka's tallest structure.,Gardens,6.9271,79.8612
+Udawatta Kele Sanctuary,Kandy,Central,Historic royal forest garden adjacent to the Temple of the Tooth with walking trails.,Gardens,7.2906,80.6337
+Waters Edge Garden,Colombo,Western,"Manicured lakeside gardens with water features, topiary and recreation areas.",Gardens,6.9271,79.8612
+Helga's Folly Garden,Kandy,Central,Eclectic artistic garden with surreal sculptures and tropical plantings.,Gardens,7.2906,80.6337
+Millennium Elephant Foundation Garden,Kegalle,Sabaragamuwa,Botanical collection focusing on elephant-friendly plants and foraging species.,Gardens,6.8379,80.4806
+Dilmah Conservation Heritage Garden,Colombo,Western,Garden showcasing Sri Lanka's agricultural heritage plants and tea varieties.,Gardens,6.9271,79.8612
+Sembuwatta Lake Garden,Elkaduwa,Central,Landscaped garden surrounding a stunning blue lake with viewpoints and facilities.,Gardens,7.3368,80.7653
+Beruwala Ayurveda Garden,Beruwala,Western,Living collection of medicinal herbs used in traditional Sri Lankan medicine.,Gardens,7.1225,79.9645
+Ranawana Arboretum,Kuruwita,Sabaragamuwa,Educational forest garden owned by the Institute of Indigenous Medicine.,Gardens,6.5640,80.5673
+Galle Fort Rampart Garden,Galle,Southern,Colonial garden along the historic fort walls with ocean views and sea breeze.,Gardens,6.0535,80.2210
+Negombo Lagoon Garden,Negombo,Western,Waterfront garden with mangrove species and coastal ecosystem plants.,Gardens,7.2008,79.8737
+Dambana Indigenous Plant Garden,Mahiyangana,Uva,Garden maintained by Vedda indigenous people showcasing traditional plant uses.,Gardens,6.9738,81.2248
+Pidurutalagala Sanctuary Garden,Nuwara Eliya,Central,Mountain garden with rare high-altitude plant species and misty landscapes.,Gardens,6.9497,80.7891
+Colombo Port City Marina Gardens,Colombo,Western,New development of modern landscaped spaces with harbor views and public art.,Gardens,6.9271,79.8612

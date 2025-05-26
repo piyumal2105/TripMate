@@ -21,11 +21,11 @@ export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null); // State for profile picture URI
-  const [base64Image, setBase64Image] = useState(null); // State for base64 string
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [fullName, setFullName] = useState();
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [base64Image, setBase64Image] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({
@@ -75,8 +75,14 @@ export default function SignUp() {
 
     try {
       // Create user in Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
+      console.log("User created:", user);
 
       // Prepare photoURL with base64 if available
       const photoURL = base64Image ? `data:image/jpeg;base64,${base64Image}` : null;
@@ -92,15 +98,18 @@ export default function SignUp() {
         fullName: fullName,
         email: email,
         uid: user.uid,
-        photoURL: base64Image ? `data:image/jpeg;base64,${base64Image}` : null,
         createdAt: new Date(),
       });
+      console.log("User data saved to Firestore");
 
       // Navigate to next screen
       router.replace("TravelPreferenceScreens/TravelPreferenceScreen");
     } catch (error) {
       console.error("Signup error:", error);
-      ToastAndroid.show("Error signing up. Please try again.", ToastAndroid.LONG);
+      ToastAndroid.show(
+        "Error signing up. Please try again.",
+        ToastAndroid.LONG
+      );
     }
   };
 
@@ -111,33 +120,7 @@ export default function SignUp() {
       </TouchableOpacity>
       <Text style={{ fontSize: 35, marginTop: 30 }}>Create New Account</Text>
 
-      {/* Profile Picture Picker */}
-      <View style={{ alignItems: "center", marginTop: 30 }}>
-        <TouchableOpacity onPress={pickProfilePicture}>
-          {profilePicture ? (
-            <Image
-              source={{ uri: profilePicture }}
-              style={{ width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: "#0478A7" }}
-            />
-          ) : (
-            <View style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              backgroundColor: "#e0e0e0",
-              justifyContent: "center",
-              alignItems: "center",
-              borderWidth: 2,
-              borderColor: "#0478A7",
-            }}>
-              <Ionicons name="camera" size={40} color="#666" />
-            </View>
-          )}
-        </TouchableOpacity>
-        <Text style={{ marginTop: 10, color: "#666" }}>Add Profile Picture</Text>
-      </View>
-
-      <View style={{ marginTop: 30 }}>
+      <View style={{ marginTop: 50 }}>
         <Text>Full Name</Text>
         <TextInput
           style={styles.input}
@@ -168,12 +151,33 @@ export default function SignUp() {
         />
       </View>
 
-      <TouchableOpacity onPress={OnCreateAccount} style={{ padding: 20, backgroundColor: "#0478A7", borderRadius: 15, marginTop: 50 }}>
-        <Text style={{ color: Colors.WHITE, textAlign: "center" }}>Create Account</Text>
+      <TouchableOpacity
+        onPress={OnCreateAccount}
+        style={{
+          padding: 20,
+          backgroundColor: "#0478A7",
+          borderRadius: 15,
+          marginTop: 50,
+        }}
+      >
+        <Text style={{ color: Colors.WHITE, textAlign: "center" }}>
+          Create Account
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.replace("auth/sign-in")} style={{ padding: 20, backgroundColor: Colors.WHITE, borderRadius: 15, marginTop: 20, borderWidth: 1 }}>
-        <Text style={{ color: Colors.PRIMARY, textAlign: "center" }}>Sign In</Text>
+      <TouchableOpacity
+        onPress={() => router.replace("auth/sign-in")}
+        style={{
+          padding: 20,
+          backgroundColor: Colors.WHITE,
+          borderRadius: 15,
+          marginTop: 20,
+          borderWidth: 1,
+        }}
+      >
+        <Text style={{ color: Colors.PRIMARY, textAlign: "center" }}>
+          Sign In
+        </Text>
       </TouchableOpacity>
     </View>
   );

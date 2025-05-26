@@ -1,0 +1,56 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.so
+*.pyo
+*.pyd
+*.swp
+*.swo
+
+# Virtual environment
+venv/
+.env/
+.venv/
+env/
+*.venv
+*.env
+
+# Dependency files
+pip-log.txt
+pip-delete-this-directory.txt
+poetry.lock
+Pipfile.lock
+
+# Logs & Debug files
+logs/
+*.log
+*.out
+*.err
+*.pid
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.vscode/
+.idea/
+*.iml
+
+# Docker files (if using Docker)
+docker-compose.override.yml
+
+# Database files (if using SQLite)
+*.sqlite3
+*.db
+
+# Pytest and test-related files
+htmlcov/
+.coverage
+*.cover
+*.py,cover
+nosetests.xml
+test-results/
