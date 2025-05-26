@@ -2,11 +2,8 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-// import { Colors } from "./../../constants/Colors";
+import { Colors } from "./../../constants/Colors";
 
-const Colors = {
-  PRIMARY: "#0478A7",
-};
 export default function TabLayout() {
   return (
     <Tabs
@@ -20,43 +17,25 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "My Trip",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="location-sharp" size={24} color="#0478A7" />
+            <Ionicons name="location-sharp" size={24} color="color" />
           ),
         }}
       />
       <Tabs.Screen
-        name="social"
+        name="discover"
         options={{
-          tabBarLabel: "Social",
+          tabBarLabel: "Discover",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="globe" size={24} color="#0478A7" />
+            <Ionicons name="compass" size={24} color="color" />
           ),
         }}
       />
       <Tabs.Screen
-        name="groups"
+        name="profile"
         options={{
-          tabBarLabel: "Groups",
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="people" size={24} color="#0478A7" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="maps"
-        options={{
-          tabBarLabel: "Maps",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="map" size={24} color="#0478A7" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="replan"
-        options={{
-          tabBarLabel: "RePlan",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="repeat" size={24} color="#0478A7" />
+            <Ionicons name="person" size={24} color="color" />
           ),
         }}
       />

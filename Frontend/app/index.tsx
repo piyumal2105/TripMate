@@ -1,25 +1,25 @@
 import { Text, View } from "react-native";
 import Login from "./../components/Login";
-import { auth } from '../configs/FirebaseConfig';
+import {auth} from './../configs/FirebaseConfig'
 import { Redirect } from "expo-router";
 import { useEffect } from "react";
 import { useRouter } from 'expo-router';
 
 export default function Index() {
 
-  const user = auth.currentUser;
-
+  const user=auth.currentUser;
+  
   return (
     <View
       style={{
         flex: 1,
-
+        
       }}
     >
 
-      {user ?
-        <Redirect href={'/mytrip'} /> :
-        <Login />
+      {user?
+    <Redirect href={'/mytrip'}/>:
+     <Login/>
       }
 
     </View>

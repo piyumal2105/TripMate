@@ -1,10 +1,11 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
-import { Colors } from "@/constants/Colors";
-import { useRouter } from "expo-router";
+import { View, Text, Image, StyleSheet, TouchableOpacity, } from 'react-native'
+import React from 'react'
+import { Colors } from '@/constants/Colors'
+import { useRouter } from 'expo-router';
 
-export default function login() {
-  const router = useRouter();
+export default function login() { 
+
+  const router=useRouter();
   return (
     <View>
       <Image
@@ -43,9 +44,6 @@ export default function login() {
         <TouchableOpacity
           style={styles.button}
           onPress={() => router.push("auth/sign-in")}
-          // onPress={() =>
-          //   router.push("TravelPreferenceScreens/TravelPreferenceScreen")
-          // }
         >
           <Text
             style={{
@@ -65,17 +63,18 @@ export default function login() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.WHITE,
-    marginTop: -20,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    height: "100%",
-    padding: 25,
+    backgroundColor:Colors.WHITE,
+    marginTop:-20,
+    borderTopLeftRadius:30,
+    borderTopRightRadius:30,
+    height:'100%',
+    padding:25,
   },
-  button: {
-    padding: 15,
-    backgroundColor: "#0478A7",
-    borderRadius: 99,
-    marginTop: "20%",
-  },
-});
+  button:{
+    padding:15,
+    backgroundColor:Colors.PRIMARY,
+    borderRadius:99,
+    marginTop:'20%',
+
+  }
+})
