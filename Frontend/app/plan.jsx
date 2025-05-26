@@ -226,9 +226,6 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 35,
-        fontStyle: 'bold',
-        fontFamily: 'outfit-bold',
-        fontcolor: '#0478A7',
         marginTop: 20,
         textAlign: 'center',
         fontFamily: 'outfit-medium',
@@ -248,7 +245,7 @@ const styles = StyleSheet.create({
         fontFamily: 'outfit-medium',
     },
     map: {
-    height: 400,
+    height: 300,
     width: '100%',
     marginVertical: 10,
 },
@@ -270,7 +267,7 @@ const styles = StyleSheet.create({
     },
     addButton: {
         padding: 15,
-        backgroundColor: '#0478A7', 
+        backgroundColor: '#000', 
         borderRadius: 10,
         marginTop: 15,
     },
@@ -290,7 +287,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         padding: 15,
-        backgroundColor: '#0478A7',
+        backgroundColor: '#000',
         borderRadius: 15,
         marginTop: 35,
         marginBottom: 35,
