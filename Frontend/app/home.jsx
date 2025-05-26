@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import {
-    View, Text, StyleSheet, FlatList, TouchableOpacity, ToastAndroid
-} from 'react-native';
-import { Link } from 'expo-router';
-import { db } from '../configs/FirebaseConfig';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Link } from 'expo-router';
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import {
+    FlatList,
+    StyleSheet,
+    Text,
+    ToastAndroid,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { db } from '../configs/FirebaseConfig';
 
 const HomeScreen = () => {
     const [trips, setTrips] = useState([]);
@@ -66,7 +71,7 @@ const HomeScreen = () => {
 
     return (
         <LinearGradient
-            colors={['#81c1ff', '#49a09d', '#1f4037']} // Sky blue, teal, dark green
+            colors={['#fff', '#fff', '#0478A7']} // Sky blue, teal, dark green
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.container}
@@ -75,7 +80,7 @@ const HomeScreen = () => {
             
             <TouchableOpacity>
                 <LinearGradient
-                    colors={['#8E2DE2', '#3b5998', '#192f6a']} // Gradient shades of blue
+                    colors={['#0478A7', '#0478A7', '#0478A7']} // Gradient shades of blue
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.planbutton}
@@ -102,13 +107,14 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 50,
-        fontFamily: 'sans-serif-light',
+        fontFamily: 'sans-serif',
         fontWeight: 'bold',
+        fontStyle: 'italic',
         textAlign: 'center',
         marginTop: 40,
         marginBottom: 20,
         textTransform: 'uppercase',
-        color: '#fff', // Ensuring readability on the gradient
+        color: '#0478A7', // Ensuring readability on the gradient
     },
     planbutton: {
         paddingVertical: 12,
@@ -127,9 +133,9 @@ const styles = StyleSheet.create({
     tripItem: {
         padding: 15,
         marginVertical: 10,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light transparency for readability
+        backgroundColor: '#0478A7', // Light transparency for readability
         borderRadius: 8,
-        shadowColor: '#000',
+        shadowColor: '#fff',
         shadowOpacity: 0.1,
         shadowRadius: 5,
         shadowOffset: { width: 0, height: 2 },
@@ -150,7 +156,7 @@ const styles = StyleSheet.create({
     tripLocation: {
         fontSize: 25,
         fontWeight: '600',
-        color: '#FF6347', // Tomato color
+        color: '#fff', // Tomato color
         textTransform: 'capitalize',
         marginRight: 10,
     },
