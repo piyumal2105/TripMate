@@ -1,98 +1,58 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi import FastAPI
+import firebase_admin
+from firebase_admin import credentials, firestore
 import pandas as pd
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import random
+from fastapi.middleware.cors import CORSMiddleware
 
-# Initialize FastAPI app
 app = FastAPI()
 
-# Enable CORS
+# Allow requests from your React Native web app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Change "*" to your frontend URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Load dataset
-df = pd.read_csv("data/sri_lanka_places.csv")
-df.dropna(inplace=True)
+# Initialize Firebase
+cred = credentials.Certificate("/Users/chamodeshan/Documents/TripMate/backend/travel-planner-89979-firebase-adminsdk-7fqnk-2df4301185.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
-# Print column names to verify dataset structure
-print("DataFrame columns:", list(df.columns))
-print("Sample data:", df.iloc[0].to_dict())
+# Load places data
+file_path = "/Users/chamodeshan/Documents/TripMate/backend/Srilankan_Places_New.csv"
+places_df = pd.read_csv(file_path)
 
-# Request model for receiving travel categories
-class TravelCategoryRequest(BaseModel):
-    categories: list
+@app.get("/recommend/")
+def recommend(uuid: str):
+    # Fetch user preferences
+    users_ref = db.collection('userPreferences')
+    users_data = [{'uuid': doc.id, **doc.to_dict()} for doc in users_ref.stream()]
 
-# Function to filter data by categories
-def filter_data_by_categories(df, selected_categories):
-    return df[df["category"].isin(selected_categories)]
-
-# Function to compute similarity
-def compute_tfidf_matrix(df_subset):
-    vectorizer = TfidfVectorizer(stop_words="english")
-    return vectorizer.fit_transform(df_subset["category"] + " " + df_subset["description"])
-
-# Function to recommend places
-def recommend_places(df_subset, similarity_matrix, selected_categories, top_n=5):
-    category_groups = df_subset.groupby("category")
-    top_places = []
-    places_per_category = max(1, top_n // len(selected_categories))
-    remaining_places = top_n
-
-    df_subset = df_subset.sample(frac=1, random_state=random.randint(1, 1000)).reset_index(drop=True)
-
-    for category in selected_categories:
-        if category in category_groups.groups:
-            cat_indices = np.where(df_subset.index.isin(category_groups.groups[category]))[0]
-            avg_sim_scores = similarity_matrix[cat_indices].mean(axis=0)
-            ranked_indices = avg_sim_scores.argsort()[::-1]
-            top_cat_indices = np.random.choice(ranked_indices[:places_per_category * 2], places_per_category, replace=False)
-            top_places.extend(df_subset.iloc[top_cat_indices].to_dict(orient="records"))
-            remaining_places -= places_per_category
-
-    if remaining_places > 0:
-        avg_sim_scores = similarity_matrix.mean(axis=0)
-        ranked_indices = avg_sim_scores.argsort()[::-1]
-        extra_indices = np.random.choice(ranked_indices[:remaining_places * 2], remaining_places, replace=False)
-        top_places.extend(df_subset.iloc[extra_indices].to_dict(orient="records"))
-
-    # Ensure latitude and longitude are included in each place
-    for place in top_places:
-        if 'latitude' not in place or place['latitude'] is None:
-            place['latitude'] = 0.0
-        if 'longitude' not in place or place['longitude'] is None:
-            place['longitude'] = 0.0
-            
-    return top_places
-
-# API endpoint to receive categories and return recommended places
-@app.post("/predict/")
-def predict_places(request: TravelCategoryRequest):
-    selected_categories = request.categories
-
-    # Filter places
-    filtered_df = filter_data_by_categories(df, selected_categories)
-
-    if filtered_df.empty:
-        raise HTTPException(status_code=404, detail="No places found for selected categories")
-
-    # Compute similarity
-    tfidf_matrix = compute_tfidf_matrix(filtered_df)
-    cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
-
-    # Get recommended places
-    recommended_places = recommend_places(filtered_df, cosine_sim, selected_categories, top_n=5)
+    # Find the user with the input UUID
+    selected_user = next((user for user in users_data if user["uuid"] == uuid), None)
     
-    # Debug output
-    if recommended_places:
-        print("Sample recommended place:", recommended_places[0])
+    if not selected_user:
+        return {"message": "UUID not found!"}
 
-    return {"recommended_places": recommended_places}
+    # Check if "Group" is in travelPreferences
+    if "Group" not in selected_user.get("travelPreferences", []):
+        return {"message": "You have not selected group travel in your Preferences"}
+
+    user_categories = selected_user["travelCategories"]
+    category_count = len(user_categories)
+
+    # Find matching users (who share at least 3 categories)
+    matching_users = [
+        user for user in users_data
+        if user["uuid"] != uuid and len(set(user["travelCategories"]) & set(user_categories)) >= min(3, category_count)
+    ]
+
+    # Find places related to the matched categories
+    matched_places = places_df[places_df["Category"].isin(user_categories)].to_dict(orient="records")
+
+    return {
+        "matchingUsers": [user["uuid"] for user in matching_users],
+        "recommendedPlaces": matched_places
+    }
