@@ -1,0 +1,9 @@
+python3 -m venv venv
+source venv/bin/activate
+
+pip install phidata pydantic flask
+pip install duckduckgo-search
+
+python app.py
+
+ npx expo start

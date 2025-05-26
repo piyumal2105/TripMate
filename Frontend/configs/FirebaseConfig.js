@@ -1,30 +1,17 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  updateDoc,
-  increment,
-} from "firebase/firestore";
 
-// Firebase configuration
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCYWUyEAJhMb-8OaO72zgTdWbN5rhh1nzs",
-  authDomain: "travel-planner-89979.firebaseapp.com",
-  projectId: "travel-planner-89979",
-  storageBucket: "travel-planner-89979.appspot.com", // Fixed incorrect storageBucket URL
-  messagingSenderId: "458478614611",
-  appId: "1:458478614611:web:ce9881ec3e89685f3e2ea6",
-  measurementId: "G-D1P6F4TLDS",
+  apiKey: "AIzaSyAZkr_C-xOXTrAw2IrdW2RSCMnt1xt2J6c",
+  authDomain: "ai-trip-planner-3723f.firebaseapp.com",
+  projectId: "ai-trip-planner-3723f",
+  storageBucket: "ai-trip-planner-3723f.appspot.com",
+  messagingSenderId: "243962249893",
+  appId: "1:243962249893:web:154baafb8d4bcbaccec34c",
+  measurementId: "G-J6Z5LYR9Y1"
 };
 
-// Initialize Firebase only once
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// Export initialized instances
-export { app, auth, db, collection, addDoc, doc, updateDoc, increment };
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig)
+export const db = getFirestore(app);
